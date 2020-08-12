@@ -1,0 +1,18 @@
+{% extends "./base.html" %}
+
+{% block h1 %}{% endblock %}
+
+{% block content %}
+<div class="row align-items-center">
+	<div class="col-md-6 mx-auto my-4">
+		<section>
+			{% include "matshare_ci/home.html" %}
+		</section>
+	</div>
+	<div class="col-sm-9 col-md-6 col-lg-5 col-xl-4 mx-auto my-4">
+		<section>
+			{% include "./snippets/login_card.html" with form=auth_form next="" %}
+		</section>
+	</div>
+</div>
+{% endblock %}

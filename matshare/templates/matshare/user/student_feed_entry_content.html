@@ -1,0 +1,37 @@
+<h1><a href="{{ MATSHARE_URL }}{{ subscription.course.get_absolute_url }}">{{ subscription.course }}</a></h1>
+
+<ul>
+	{% if not subscription.course.is_static %}
+		<li><a href="{{ MATSHARE_URL }}{{ subscription.course.urls.course_material_html }}">{% trans "View HTML online" %}</a></li>
+	{% endif %}
+	{% if subscription.course.is_static and not subscription.course.sub_courses.all %}
+		<li><a href="{{ MATSHARE_URL }}{{ subscription.course.urls.course_material_download }}">{% trans "Download" %}</a></li>
+	{% else %}
+		<li>
+			{% trans "Download" %}:
+			{% for format in Format %}
+				<a href="{{ MATSHARE_URL }}{{ subscription.course.urls.course_material_download }}?format={{ format.name }}&include_sub_courses=1">{{ format.label }}</a>
+				{% if not forloop.last %}|{% endif %}
+			{% endfor %}
+		</li>
+	{% endif %}
+</ul>
+
+<h2>{% trans "Latest changes" %}</h2>
+{% if courses|length > 1 %}
+	{% blocktrans trimmed %}
+		Courses that changed last are listed first.
+	{% endblocktrans %}
+{% endif %}
+{% for course in courses %}
+	<h3><a href="{{ MATSHARE_URL }}{{ course.get_absolute_url }}">{{ course }}</a></h3>
+	{% if course.latest_commits %}
+		<ul>
+			{% for commit in course.latest_commits %}
+				<li>{% include "../snippets/git_commit.html" with commit=commit %}</li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		{% trans "Last updated" %}: {{ course.material_updated_last }}
+	{% endif %}
+{% endfor %}

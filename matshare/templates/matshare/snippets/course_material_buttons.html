@@ -1,0 +1,41 @@
+{% comment %}
+Pass the Course as course.
+If desired, pass include_sub_courses=True to generate download links that include
+sub courses in the download.
+
+For courses with static material, no online viewing link is generated and the
+download format selection is not shown for such courses if include_sub_courses=True
+is not given.
+{% endcomment %}
+
+<div class="d-flex justify-content-end align-items-center">
+	{% if not course.is_static %}
+		<a class="btn btn-sm btn-primary mr-2" href="{{ course.urls.course_material_html }}" title="{% trans "View material online as HTML" %}">
+			<i class="fas fa-folder-open" aria-hidden="true"></i>
+		</a>
+	{% endif %}
+	{% if include_sub_courses and course.sub_courses.all %}
+		{% as title %}{% trans "Download including sub-courses" %}{% endas %}
+	{% else %}
+		{% as title %}{% trans "Download" %}{% endas %}
+	{% endif %}
+	{% if course.is_static and not course.sub_courses.all %}
+		<a class="btn btn-sm btn-primary" href="{{ course.urls.course_material_download }}" title="{{ title }}">
+			<i class="fas fa-download" aria-hidden="true"></i>
+		</a>
+	{% else %}
+		<div class="dropdown">
+			{% as btn_id %}materialDownloadBtn{% uuid %}{% endas %}
+			<button class="btn btn-sm btn-primary" id="{{ btn_id }}" data-toggle="dropdown" title="{{ title }}" aria-haspopup="true" aria-expanded="false">
+				<i class="fas fa-download" aria-hidden="true"></i>
+			</button>
+			<div class="dropdown-menu" aria-labelledby="{{ btn_id }}">
+				{% for format in Format %}
+					<a class="dropdown-item" href="{{ course.urls.course_material_download }}?format={{ format.name }}{% if include_sub_courses %}&include_sub_courses=1{% endif %}">
+						{{ format.label }}
+					</a>
+				{% endfor %}
+			</div>
+		</div>
+	{% endif %}
+</div>

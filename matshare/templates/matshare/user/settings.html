@@ -1,0 +1,101 @@
+{% extends "../base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap">
+
+	<div class="col-md-6 mb-4">
+		<div class="card bg-light border-primary">
+			<h4 class="card-header text-center bg-primary">{% trans "Personal information" %}</h4>
+			<div class="card-body">
+				<p class="card-text">
+					{% blocktrans trimmed %}
+						Contact the support if this information is no longer correct and needs to be updated.
+					{% endblocktrans %}
+				</p>
+				<dl class="row my-0">
+					<dt class="col-lg-4">{% trans "Username" %}:</dt>
+					<dd class="col-lg-8">{{ user.username }}</dd>
+					<dt class="col-lg-4">{% trans "E-mail address" %}:</dt>
+					<dd class="col-lg-8">{{ user.email }}</dd>
+					<dt class="col-lg-4">{% trans "First name" %}:</dt>
+					<dd class="col-lg-8">{{ user.first_name }}</dd>
+					<dt class="col-lg-4">{% trans "Last name" %}:</dt>
+					<dd class="col-lg-8">{{ user.last_name }}</dd>
+					<dt class="col-lg-4">{% trans "Courses of study" %}:</dt>
+					<dd class="col-lg-8">
+						{% if study_courses %}
+							<ul class="list-group list-group-horizontal">
+								{% for study_course in study_courses %}
+									<li class="list-group-item">{{ study_course.name }}</li>
+								{% endfor %}
+							</ul>
+						{% else %}
+							&mdash;
+						{% endif %}
+					</dd>
+					<dt class="col-lg-4">{% trans "Staff member" %}:</dt>
+					<dd class="col-lg-8">{{ user.is_staff|yesno }}</dd>
+					{% if user.is_superuser %}
+						<dt class="col-lg-4">{% trans "Superuser" %}:</dt>
+						<dd class="col-lg-8">{{ user.is_superuser|yesno }}</dd>
+					{% endif %}
+				</dl>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6 mb-4">
+		<div class="card bg-light border-primary">
+			<h4 class="card-header text-center bg-primary">{% trans "Settings" %}</h4>
+			<form class="m-0" method="POST">{% csrf_token %}
+				<input type="hidden" name="change_settings" value="1" />
+				{% include "../snippets/form/non_field_errors.html" with form=settings_form %}
+				<div class="card-body">
+					{% include "../snippets/form/field.html" with field=settings_form.time_zone %}
+					{% include "../snippets/form/field.html" with field=settings_form.default_material_notification_frequency %}
+					{% include "../snippets/form/field.html" with field=settings_form.update_material_notification_frequencies %}
+					{% if settings_form.sources_notification_frequency %}
+						{% include "../snippets/form/field.html" with field=settings_form.sources_notification_frequency %}
+					{% endif %}
+				</div>
+				<div class="card-footer text-right">
+					<button class="btn btn-primary" type="submit">
+						{% trans "Save" %}
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div class="col-md-8 mx-auto mb-4">
+		<div class="card bg-light border-primary">
+			<h4 class="card-header text-center bg-primary">{% trans "Change password" %}</h4>
+			{% if user.has_usable_password %}
+				<form class="m-0" method="POST">{% csrf_token %}
+					<input type="hidden" name="change_password" value="1" />
+					{% include "../snippets/form/non_field_errors.html" with form=password_form %}
+					<div class="card-body">
+						{% include "../snippets/form/field.html" with field=password_form.old_password %}
+						{% include "../snippets/form/field.html" with field=password_form.new_password1 %}
+						{% include "../snippets/form/field.html" with field=password_form.new_password2 %}
+					</div>
+					<div class="card-footer text-right">
+						<button class="btn btn-primary" type="submit">
+							{% trans "Change password" %}
+						</button>
+					</div>
+				</form>
+			{% else %}
+				<div class="card-body">
+					<p class="card-text">
+						{% blocktrans trimmed %}
+							Your password can't be changed from inside MatShare. Contact the support for further information.
+						{% endblocktrans %}
+					</p>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+
+</div>
+{% endblock %}

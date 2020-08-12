@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+"""
+Notify MatShare about changed references.
+"""
+
+import json
+import os
+import sys
+import urllib.request
+
+
+# Load configuration passed by the git authorization view via CGI variable
+user, cfg = os.environ["MS_GIT_AUTH"].split(":", 1)
+cfg = json.loads(cfg)
+url = cfg.get("push_notify_url")
+if not url:
+    sys.exit(0)
+
+updates = []
+for line in sys.stdin:
+    old_rev, new_rev, ref = line.split()
+    updates.append((ref, old_rev, new_rev))
+
+data = {"user": user, "updates": updates}
+req = urllib.request.Request(
+    url,
+    data=json.dumps(data).encode(),
+    headers={"Content-Type": "application/json"},
+    method="POST",
+)
+urllib.request.urlopen(req)

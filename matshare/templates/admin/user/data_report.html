@@ -1,0 +1,87 @@
+<!doctype html>
+
+<html>
+<head>
+{% as title %}{% blocktrans trimmed with name=user.get_full_name %}Report of data stored about {{ name }}{% endblocktrans %}{% endas %}
+<title>{{ title }}</title>
+</head>
+
+<body>
+<h1>{{ title }}</h1>
+
+{% blocktrans trimmed with now=now %}
+	This report shows all data related to the user account stored in the MatShare system as of {{ now }}.
+{% endblocktrans %}
+
+<p>
+	{% trans "Username" %}: {{ user.username }}<br/>
+	{% trans "Account created" %}: {{ user.date_joined }}<br/>
+	{% trans "Last login" %}: {{ user.last_login }}<br/>
+</p>
+
+<hr/>
+<p>
+	{% trans "First name" %}: {{ user.first_name }}<br/>
+	{% trans "Last name" %}: {{ user.last_name }}<br/>
+	{% trans "E-mail address" %}: {{ user.email }}<br/>
+</p>
+
+<hr/>
+<p>
+	{% trans "Active" %}: {{ user.is_active|yesno }}<br/>
+	{% trans "Staff member" %}: {{ user.is_staff|yesno }}<br/>
+	{% trans "Superuser" %}: {{ user.is_superuser|yesno }}<br/>
+</p>
+
+<hr/>
+<p>
+	{% trans "Preferred language" %}: {{ user.get_language_display|or_dash }}<br/>
+	{% trans "Preferred time zone" %}: {{ user.time_zone }}<br/>
+	{% trans "Default e-mail notification frequency for new material" %}: {{ user.get_default_material_notification_frequency_display }}<br/>
+	{% trans "E-mail notification frequency for new sources" %}: {{ user.get_sources_notification_frequency_display }}<br/>
+</p>
+
+{% with study_courses=user.study_courses.all %}
+	{% if study_courses %}
+		<hr/>
+		<p>
+			{% trans "By these records, you are member of the following courses of study. Note that this is no official statement of the university." %}
+			<ul>
+				{% for study_course in study_courses %}
+					<li>{{ study_course }}</li>
+				{% endfor %}
+			</ul>
+		</p>
+	{% endif %}
+{% endwith %}
+
+{% with courses=user.subscribed_courses.all %}
+	{% if courses %}
+		<hr/>
+		<p>
+			{% trans "You are subscribed to the following courses as a student." %}
+			<ul>
+				{% for course in courses %}
+					<li>{{ course }}</li>
+				{% endfor %}
+			</ul>
+		</p>
+	{% endif %}
+{% endwith %}
+
+{% with courses=user.edited_courses.all %}
+	{% if courses %}
+		<hr/>
+		<p>
+			{% trans "You are or were editor of the following courses." %}
+			<ul>
+				{% for course in courses %}
+					<li>{{ course }}</li>
+				{% endfor %}
+			</ul>
+		</p>
+	{% endif %}
+{% endwith %}
+
+</body>
+</html>

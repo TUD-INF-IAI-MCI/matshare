@@ -1,0 +1,25 @@
+{% comment %}
+This snippet is appended to all e-mails sent by MatShare.
+
+You may want to include additional information about your organization.
+
+The Reply-To header is always set to the address you configured via MS_CONTACT_EMAIL,
+so it's safe to ask people to reply to e-mails for contacting the support.
+{% endcomment %}
+
+<p>
+	{% trans "Sincerely," context "mail closing" %}<br/>
+	{% trans "The MatShare Team" context "mail closing" %}
+</p>
+
+<hr/>
+
+<p>
+	{% blocktrans trimmed %}
+		If you have any questions, answer to this e-mail using the reply function of your mail client.
+	{% endblocktrans %}
+</p>
+
+<p>
+	<a href="{{ MATSHARE_URL }}">MatShare</a>
+</p>

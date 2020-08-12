@@ -1,0 +1,23 @@
+{% extends "./base.html" %}
+
+{% block content %}
+<p>
+	{% blocktrans trimmed %}
+	You've been invited to access a course in the material distribution system.
+	{% endblocktrans %}
+</p>
+
+<p style="text-align:center">
+	<strong>{{ easy_access.course }}</strong>
+</p>
+
+<p style="text-align:center">
+	<a href="{{ easy_access.absolute_activation_url }}">{% trans "Access the course" %}</a>
+</p>
+
+<p>
+	{% blocktrans trimmed with expiration_date=easy_access.expiration_date %}
+		The link is valid until {{ expiration_date }}. Keep it secret, as everyone who gains access to it will, together with knowledge of your e-mail address, be able to access the course on your behalf.
+	{% endblocktrans %}
+</p>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends "./detail_base.html" %}
+
+{% block course_detail_content %}
+
+<div class="card bg-light border-info mb-4">
+	<h4 class="card-header text-white bg-info">
+		{% trans "Metadata" %}
+	</h4>
+	<div class="card-body pt-3 pb-1">
+		<dl class="row my-0">
+			<dt class="col-sm-4">{% trans "Editing status" %}:</dt>
+			<dd class="col-sm-8">
+				{% if object.editing_status == object.EditingStatus.in_progress %}
+					<i class="fas fa-spinner mr-1" aria-hidden="true"></i>
+				{% elif object.editing_status == object.EditingStatus.complete %}
+					<i class="fas fa-check mr-1" aria-hidden="true"></i>
+				{% elif object.editing_status == object.EditingStatus.suspended or object.editing_status == object.EditingStatus.cancelled %}
+					<i class="fas fa-times mr-1" aria-hidden="true"></i>
+				{% endif %}
+				{{ object.get_editing_status_display }}
+			</dd>
+			<dt class="col-sm-4">{% trans "Author" %}:</dt>
+			<dd class="col-sm-8">{{ object.author|or_dash }}</dd>
+			<dt class="col-sm-4">{% trans "Publisher" %}:</dt>
+			<dd class="col-sm-8">{{ object.publisher|or_dash }}</dd>
+			<dt class="col-sm-4">{% trans "Language" %}:</dt>
+			<dd class="col-sm-8">{{ object.get_language_display }}</dd>
+			{% if object.source_format %}
+				<dt class="col-sm-4">{% trans "Source format" %}:</dt>
+				<dd class="col-sm-8">{{ object.source_format }}</dd>
+			{% endif %}
+			{% if object.doi %}
+				<dt class="col-sm-4">DOI:</dt>
+				<dd class="col-sm-8"><a target="_blank" href="https://doi.org/{{ object.doi }}">{{ object.doi }}</a></dd>
+			{% endif %}
+			{% if object.isbn %}
+				<dt class="col-sm-4">ISBN:</dt>
+				<dd class="col-sm-8">{{ object.isbn_dashed }}</dd>
+			{% endif %}
+		</dl>
+	</div>
+</div>
+
+{% include "matshare_ci/course_overview_extra.html" with course=object %}
+
+{% if access_level >= AccessLevel.material %}
+	<div class="card bg-light border-info mb-4">
+		<div class="card-header text-white bg-info d-flex justify-content-between align-items-center">
+			<h4 class="my-0">{% trans "Material" %}</h4>
+			{% include "../snippets/course_material_buttons.html" with course=object formats=formats include_sub_courses=True %}
+		</div>
+		<div class="card-body pt-3 pb-1">
+			<dl class="row my-0">
+				<dt class="col-sm-4">{% trans "Last updated" %}:</dt>
+				<dd class="col-sm-8">
+					{{ object.material_updated_last|reltime }}
+					{% if object.material_updated_last is not None %}
+						&mdash; {{ object.material_updated_last }}
+					{% endif %}
+				</dd>
+				{% if object.material_revision %}
+					<dt class="col-sm-4">{% trans "Current revision" %}:</dt>
+					<dd class="col-sm-8">{{ object.material_revision|git_short_rev }}</dd>
+				{% endif %}
+			</dl>
+		</div>
+		{% if student_subscription_form is not None %}
+			<div class="card-body pt-0">
+				<h5 class="card-title">
+					{% if student_subscription is None %}
+						{% trans "Subscribe for material updates" %}
+					{% else %}
+						{% trans "Manage your subscription" %}
+					{% endif %}
+				</h5>
+				<form class="m-0" action="{{ object.urls.course_student_subscription }}" method="POST">{% csrf_token %}
+					{% if student_subscription is None %}
+						<p class="card-text">
+							{% blocktrans trimmed %}
+								You're allowed to subscribe to this course.
+							{% endblocktrans %}
+							{% blocktrans trimmed %}
+								Subscribed students can choose to get notified by mail whenever new material is available and have the course listed on both their personal dashboard and news feed for quick access.
+							{% endblocktrans %}
+						</p>
+					{% else %}
+						<p class="card-text">
+							{% blocktrans trimmed %}
+								You're subscribed to this course for material updates and may update subscription-related settings here.
+							{% endblocktrans %}
+						</p>
+					{% endif %}
+					{% include "../snippets/form/field.html" with field=student_subscription_form.notification_frequency %}
+					<div class="text-center text-md-right">
+						{% if student_subscription is None %}
+							<button class="btn btn-primary ml-md-auto m-2 my-md-0" type="submit">
+								{% trans "Subscribe" %}
+							</button>
+						{% else %}
+							<button class="btn btn-primary ml-md-auto m-2 my-md-0" type="submit">
+								{% trans "Update subscription" %}
+							</button>
+							<button id="unsubscribeButton" class="btn btn-danger m-2 my-md-0" type="submit" name="unsubscribe" value="1">
+								{% trans "Unsubscribe me" %}
+							</button>
+							<script>
+								{% include "./overview_confirm_unsubscribe.js" %}
+							</script>
+						{% endif %}
+					</div>
+				</form>
+			</div>
+		{% endif %}
+	</div>
+{% else %}
+	<div class="card bg-warning border-warning mb-4" role="alert">
+		<div class="card-body">
+			<h4 class="card-title">
+				<i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>
+				{% trans "Material is available, but you don't have access to it" %}
+			</h4>
+			<p class="card-text">
+				{% if not user.is_authenticated %}
+					{% as sign_in_link %}<a href="{% url "login" %}">{% trans "sign in" %}</a>{% endas %}
+					{% blocktrans trimmed with sign_in_link=sign_in_link %}
+						If you have a user account, you may want to {{ sign_in_link }}?
+					{% endblocktrans %}
+				{% endif %}
+				{% blocktrans trimmed %}
+					Contact the support for further information.
+				{% endblocktrans %}
+			</p>
+		</div>
+	</div>
+{% endif %}
+
+{% if sub_courses %}
+	<div class="card bg-light border-info mb-4">
+		<div class="card-header text-white bg-info">
+				<h4 class="my-0">{% trans "Sub-courses" %}</h4>
+				<div class="small">
+					{% blocktrans trimmed count num=sub_courses|length %}
+						In addition to its main content, this course has a sub-course.
+						{% plural %}
+						In addition to its main content, this course has {{ num }} sub-courses.
+					{% endblocktrans %}
+				</div>
+		</div>
+		<ul class="list-group list-group-flush">
+			{% for sub_course in sub_courses %}
+				<li class="list-group-item d-flex justify-content-between align-items-center pt-1 pb-2">
+					<div>{% include "../snippets/course_lead.html" with course=sub_course %}</div>
+					{% if access_level >= AccessLevel.material %}
+						{% include "../snippets/course_material_buttons.html" with course=sub_course formats=formats %}
+					{% endif %}
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "./detail_base.html" %}
+
+{% block extra_head %}
+{% if not failed_builds %}
+	<meta http-equiv="refresh" content="10; URL={{ request.build_absolute_uri }}">
+{% endif %}
+{% endblock %}
+
+{% block course_detail_content %}
+{% if failed_builds %}
+	<div class="card text-white bg-danger mb-4" role="alert" tabindex="0" data-ms-autofocus="true">
+		<div class="card-body">
+			<p class="card-text">
+				<i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>
+				{% blocktrans trimmed %}
+					Material building has failed for some reason. Please contact the support.
+				{% endblocktrans %}
+			</p>
+		</div>
+	</div>
+{% else %}
+	<div class="card bg-info mb-4" role="alert" tabindex="0" data-ms-autofocus="true">
+		<div class="card-body">
+			<p class="card-text">
+				<i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>
+				{% blocktrans trimmed %}
+					Please wait, the requested material is being built for you right now.
+				{% endblocktrans %}
+			</p>
+			<p class="card-text">
+				{% as reload_link %}<a href="">{% trans "reload the page manually" %}</a>{% endas %}
+				{% blocktrans trimmed with reload_link=reload_link %}
+					The page will automatically be reloaded in a few seconds. If it isn't, {{ reload_link }}.
+				{% endblocktrans %}
+			</p>
+		</div>
+	</div>
+{% endif %}
+
+<table class="table table-hower">
+	<thead class="thead-light">
+		<tr>
+			<th class="col-9 col-lg-10" scope="col">{% trans "Course" %}</th>
+			<th class="col-3 col-lg-2" scope="col">{% trans "Build status" %}</th>
+		</tr>
+	</thead>
+	{% for build in builds %}
+		<tr class="{% if build.status == Status.failed %}table-danger{% endif %}">
+			<td scope="row">{{ build.course }}</td>
+			<td>
+				{{ build.get_status_display }}
+				{% if build.status == Status.failed %}
+					<br/>{{ build.error_message }}
+				{% endif %}
+			</td>
+		</tr>
+	{% endfor %}
+</table>
+{% endblock %}

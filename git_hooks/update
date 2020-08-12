@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+"""
+Update hook that enforces MatShare ACL passed via GIT_AUTH environment variable.
+"""
+
+import json
+import fnmatch
+import functools
+import os
+import sys
+
+import matshare.git.utils as git_utils
+import pygit2
+
+
+# How many ACL violations to list to the user at a time before exiting;
+# 0 disables the limit
+MAX_SHOW_VIOLATIONS = 10
+
+
+@functools.lru_cache(maxsize=10000)
+def check_access(path):
+    """Check whether access to path is granted by ACL. Return ``False`` for no match."""
+    for path_pattern, access in acl:
+        if not fnmatch.fnmatchcase(path, path_pattern):
+            continue
+        # Rule matches
+        return access
+    # Deny if no rule matched
+    return False
+
+
+# Read command line arguments passed by git
+ref_name, old_rev, new_rev = sys.argv[1:]
+
+# Load configuration passed by the git authorization view via CGI variable
+user, cfg = os.environ["MS_GIT_AUTH"].split(":", 1)
+cfg = json.loads(cfg)
+# Filter for only those ACL which apply to the reference to be updated
+acl = [
+    (path_pattern, bool(access))
+    for ref_pattern, path_pattern, access in cfg["acl"]
+    if fnmatch.fnmatchcase(ref_name, ref_pattern)
+]
+
+# When ("*", True) is in ACL before any deny rule, user has full access and special powers
+for path_pattern, access in acl:
+    if not access:
+        break
+    if path_pattern == "*":
+        print(
+            f"\nYou ({user}) have full access to {ref_name!r}, behave well!\n",
+            file=sys.stderr,
+        )
+        sys.exit(0)
+
+if not acl:
+    print(f"\nERROR: You ({user}) may not push to {ref_name!r}!\n", file=sys.stderr)
+    sys.exit(1)
+
+# Git executes the hook with repository's root as working directory
+repo = pygit2.Repository(".")
+if old_rev in git_utils.NULL_REFS:
+    # New references can't be created without full access
+    print(f"\nERROR: You ({user}) may not create {ref_name!r}!\n", file=sys.stderr)
+    sys.exit(1)
+if new_rev in git_utils.NULL_REFS:
+    # References can't be deleted without full access
+    print(f"\nERROR: You ({user}) may not delete {ref_name!r}!\n", file=sys.stderr)
+    sys.exit(1)
+old_commit = repo.revparse_single(old_rev)
+new_commit = repo.revparse_single(new_rev)
+
+violations = []
+for parent, child in git_utils.walk_pairwise(repo, new_commit):
+    for delta in parent.tree.diff_to_tree(child.tree).deltas:
+        if not check_access(delta.new_file.path):
+            violations.append((child.short_id, delta.status, delta.new_file.path))
+            if MAX_SHOW_VIOLATIONS and len(violations) > MAX_SHOW_VIOLATIONS:
+                # Don't try to find more violations than should be listed
+                break
+    else:
+        if parent.id == old_commit.id:
+            # Reached the commit the reference pointed to before pushing
+            break
+        continue
+    # The inner loop broke, hence no more checks are needed
+    break
+else:
+    # We never reached the old commit; this was a force push!
+    print(
+        f"\nERROR: You ({user}) may not force-push to {ref_name!r}!\n", file=sys.stderr
+    )
+    sys.exit(1)
+
+if violations:
+    status_labels = {
+        pygit2.GIT_DELTA_ADDED: "added",
+        pygit2.GIT_DELTA_DELETED: "deleted",
+        pygit2.GIT_DELTA_MODIFIED: "modified",
+    }
+    print(
+        f"\nERROR: You ({user}) may not change these files on {ref_name!r}:\n",
+        file=sys.stderr,
+    )
+    print("    Commit   Action    File", file=sys.stderr)
+    print("    -------  --------  ------------------------------", file=sys.stderr)
+    for idx, (commit_id, status, path) in enumerate(violations):
+        print(f"    {commit_id}  {status_labels[status]:<8}  {path}", file=sys.stderr)
+        if idx + 1 == MAX_SHOW_VIOLATIONS:
+            print("    ... and more!", file=sys.stderr)
+            break
+    print("\nTidy up your commits and try again.\n", file=sys.stderr)
+
+    # Reject the update
+    sys.exit(1)
+
+print(
+    f"""
+Thank you, {user}, for this beautiful push! Serving you was a pleasure.
+Have a nice day and all the best!
+"""
+)

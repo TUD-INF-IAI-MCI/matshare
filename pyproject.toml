@@ -1,0 +1,35 @@
+[build-system]
+requires = ["poetry ~= 1.0"]
+build-backend = "poetry.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ["py37"]
+
+[tool.poetry]
+name = "matshare"
+version = "0.1.0"
+description = ""
+authors = ["Robert Schindler <robert.schindler@mailbox.tu-dresden.de>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+argon2-cffi = "~=19.2"
+django = "~=3.0.9"
+django-auth-ldap = "~=2.2"
+django-environ = "~=0.4"
+django-filter = "~=2.3"
+django-flexquery = "~=4.2"
+django-timezone-field = "~=4.0"
+django-watson = "~=1.5"
+django-widget-tweaks = "~=1.4"
+feedgen = "~=0.9"
+magsbs-matuc = {git = "https://github.com/TUD-INF-IAI-MCI/AGSBS-infrastructure", rev = "master"}
+psycopg2-binary = "~=2.8"
+pygit2 = "~=1.2"
+python-stdnum = "~=1.14"
+rules = "~=2.2"
+uwsgi_tasks = "~=0.7"
+
+[tool.poetry.dev-dependencies]
+black = ">=19.10b0"

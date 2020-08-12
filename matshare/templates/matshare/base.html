@@ -1,0 +1,199 @@
+{% load static %}
+
+<!doctype html>
+
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>{% block title %}{{ view.get_title }}{% endblock %} &mdash; MatShare</title>
+<link rel="stylesheet" href="{% static "matshare/css/matshare.css" %}">
+<link rel="stylesheet" href="{% static "fontawesome/css/all.min.css" %}">
+<script src="{% static "jquery/jquery.min.js" %}"></script>
+<script src="{% static "bootstrap/js/bootstrap.bundle.min.js" %}"></script>
+{# Include the current language code to prevent using a wrong, cached catalog after switching the language, even though the parameter isn't respected server-side #}
+<script src="{% url "i18n_js" %}?lang={{ LANGUAGE_CODE }}"></script>
+<script src="{% static "matshare/js/main.js" %}"></script>
+{% block extra_head %}{% endblock %}
+{% include "matshare_ci/head_extra.html" %}
+</head>
+
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+	<header>
+		<a class="navbar-brand" href="{% url "home" %}">
+			{% include "matshare_ci/navbar_brand.html" %}
+		</a>
+	</header>
+
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" title="{% trans "Toggle navigation menu" %}">
+		<i class="fas fa-bars" aria-hidden="true"></i>
+	</button>
+	<div class="collapse navbar-collapse" id="navbarCollapse">
+		<ul class="navbar-nav">
+			{% if user.is_authenticated %}
+				<li class="nav-item">
+					<a class="nav-link{% if view.is_user_dashboard %} active{% endif %}" href="{% url "user_dashboard" %}">
+						<i class="fas fa-home mr-1" aria-hidden="true"></i>
+						{% trans "Dashboard" %}
+					</a>
+				</li>
+			{% endif %}
+			<li class="nav-item">
+				<a class="nav-link{% if view.is_course_directory %} active{% endif %}" href="{% url "course_directory" %}">
+					<i class="fas fa-book mr-1" aria-hidden="true"></i>
+					{% trans "Course directory" %}
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	<ul class="navbar-nav">
+		{% if user.is_authenticated %}
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<i class="fas fa-user mr-1" aria-hidden="true"></i>
+					{{ user.get_short_name }}
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarUserDropdown">
+					<a class="dropdown-item btn btn-sm btn-info{% if view.is_user_settings %} active{% endif %}" href="{% url "user_settings" %}">
+						<i class="fas fa-cog mr-1" aria-hidden="true"></i>
+						{% trans "My settings" %}
+					</a>
+					<div class="dropdown-divider"></div>
+					{% if user.is_staff %}
+						<a class="dropdown-item btn btn-sm btn-danger" href="{% url "admin:index" %}">
+							<i class="fas fa-hammer mr-1" aria-hidden="true"></i>
+							{% trans "Administration tool" %}
+						</a>
+						<div class="dropdown-divider"></div>
+					{% endif %}
+					<a class="dropdown-item btn btn-sm" href="{% url "logout" %}">
+						<i class="fas fa-sign-out-alt mr-1" aria-hidden="true"></i>
+						{% trans "Sign out" %}
+					</a>
+				</div>
+			</li>
+		{% else %}
+			<li class="nav-item">
+				<a class="nav-link{% if view.is_login %} active{% endif %}" href="{% url "login" %}">
+					<i class="fas fa-sign-in-alt mr-1" aria-hidden="true"></i>
+					{% trans "Sign in" %}
+				</a>
+			</li>
+		{% endif %}
+	</ul>
+
+	<ul class="navbar-nav">
+		<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" href="#" id="navbarLangDropdown" role="button" data-toggle="dropdown" title="{% trans "Language" %}" aria-haspopup="true" aria-expanded="false">
+				<i class="fas fa-flag" aria-hidden="true"></i>
+			</a>
+			<div class="dropdown-menu" aria-labelledby="navbarLangDropdown">
+				<form class="m-0" action="{% url "set_language" %}" method="POST">{% csrf_token %}
+					{% get_current_language as LANGUAGE_CODE %}
+					{% get_available_languages as LANGUAGES %}
+					{% get_language_info_list for LANGUAGES as languages %}
+					{% for lang in languages %}
+						<button class="dropdown-item btn btn-sm{% if lang.code == LANGUAGE_CODE %} active{% endif %}" type="submit" name="language" value="{{ lang.code }}"{% if lang.code == LANGUAGE_CODE %} aria-pressed="true"{% endif %}>{{ lang.name_local }}</button>
+					{% endfor %}
+				</form>
+			</div>
+		</li>
+	</ul>
+</nav>
+
+{% if not request.consents.cookies %}
+	<div class="card bg-warning border-warning my-4" role="alert" tabindex="0" data-ms-autofocus="true">
+		<div class="card-body">
+			<h4 class="card-title font-weight-bold">
+				<i class="fas fa-exclamation-triangle mr-1" aria-hidden="true"></i>
+				{% blocktrans trimmed %}
+					This site requires the use of cookies.
+				{% endblocktrans %}
+			</h4>
+			<p class="card-text">
+				{% blocktrans trimmed %}
+					These cookies are necessary for proper operation of the website.
+				{% endblocktrans %}
+			</p>
+			<p class="card-text">
+				{% blocktrans trimmed %}
+					If you don't agree with cookies being stored on your device at all, don't continue browsing the site.
+				{% endblocktrans %}
+				{% as privacy_policy_link %}<a href="{% url "legal_notice" %}">{% trans "Privacy policy" %}</a>{% endas %}
+				{% blocktrans trimmed with privacy_policy_link=privacy_policy_link %}
+					Read more about how your personal data is processed in the {{ privacy_policy_link }}.
+				{% endblocktrans %}
+			</p>
+		</div>
+		<div class="card-footer text-right">
+			<form class="m-0" action="{% url "cookie_consent" %}" method="POST">{% csrf_token %}
+				<button class="btn btn-primary" type="submit">
+					<i class="fas fa-check mr-1" aria-hidden="true"></i>
+					{% trans "Accept" %}
+				</button>
+			</form>
+		</div>
+	</div>
+{% endif %}
+
+<div class="container mt-3 mb-4">
+<main>
+{% if messages %}
+	<ul class="list-group my-4" role="alert" tabindex="0" data-ms-autofocus="true">
+		{% for msg in messages %}
+			{% if msg.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+				{% as msg_class %}text-white bg-info{% endas %}
+				{% as icon_class %}fas fa-info{% endas %}
+			{% elif msg.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+				{% as msg_class %}bg-success{% endas %}
+				{% as icon_class %}fas fa-check{% endas %}
+			{% elif msg.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+				{% as msg_class %}bg-warning{% endas %}
+				{% as icon_class %}fas fa-exclamation-triangle{% endas %}
+			{% elif msg.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+				{% as msg_class %}bg-danger{% endas %}
+				{% as icon_class %}fas fa-exclamation-triangle{% endas %}
+			{% else %}
+				{% as msg_class %}{% endas %}
+				{% as icon_class %}{% endas %}
+			{% endif %}
+			<li class="list-group-item {{ msg_class }} font-weight-bold">
+				{% if icon_class %}
+					<i class="{{ icon_class }} mr-1" aria-hidden="true"></i>
+				{% endif %}
+				{{ msg }}
+			</li>
+		{% endfor %}
+	</ul>
+{% endif %}
+
+{% block h1 %}<h1 class="mb-4">{{ view.get_title }}</h1>{% endblock %}
+
+{% block content %}{% endblock %}
+</main>
+</div>
+
+<footer>
+<div class="navbar navbar-dark bg-dark align-items-start">
+	<div class="navbar-text small mx-auto">
+		<strong>{% trans "This service is provided by:" %}</strong><br/>
+		{% include "matshare_ci/footer_operator.html" %}
+	</div>
+	<ul class="navbar-nav mx-auto">
+		<li class="nav-item small">
+			<a class="nav-link" href="{% url "legal_notice" %}">{% trans "Legal notice and privacy policy" %}</a>
+		</li>
+	</ul>
+	<div class="navbar-text small text-center mx-auto">
+		MatShare v{{ MATSHARE_VERSION }}, &copy; 2020 &mdash; Robert Schindler / TU Dresden
+	</div>
+</div>
+</footer>
+</body>
+
+</html>

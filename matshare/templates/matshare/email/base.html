@@ -1,0 +1,29 @@
+<!doctype html>
+
+<html>
+
+<body>
+
+<p>
+	{% if name %}
+		{% blocktrans trimmed with name=name context "mail opening" %}
+			Hello {{ name }},
+		{% endblocktrans %}
+	{% elif user is not None %}
+		{% blocktrans trimmed with name=user.get_full_name context "mail opening" %}
+			Hello {{ name }},
+		{% endblocktrans %}
+	{% else %}
+		{% blocktrans trimmed context "mail opening" %}
+			Hello,
+		{% endblocktrans %}
+	{% endif %}
+</p>
+
+{% block content %}{% endblock %}
+
+{% include "matshare_ci/email_signature.html" %}
+
+</body>
+
+</html>

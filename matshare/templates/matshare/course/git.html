@@ -1,0 +1,71 @@
+{% extends "./detail_base.html" %}
+
+{% block course_detail_content %}
+<p class="card-text">
+	{% blocktrans trimmed %}
+		You can clone this course's git repository using the following URL:
+	{% endblocktrans %}
+</p>
+
+<p class="card-text">
+	<input id="gitUrlInput" class="form-control d-inline" style="max-width:75%;" type="text" value="{{ course.absolute_git_clone_url }}" readonly/>
+	<button id="gitUrlCopyButton" class="btn btn-secondary" title="{% trans "Copy to clipboard" %}">
+		<i class="fas fa-clipboard" aria-hidden="true"></i>
+	</button>
+	<script>
+		$("#gitUrlCopyButton").click(function () {
+			$("#gitUrlInput").select();
+			document.execCommand("copy");
+		});
+	</script>
+</p>
+
+<p class="card-text">
+	{% blocktrans trimmed %}
+		When asked for credentials, authenticate with your username and password as you do in the web interface.
+	{% endblocktrans %}
+</p>
+
+{% if git_acl %}
+	<div class="card bg-light border-info">
+		<h4 class="card-header text-white bg-info">{% trans "Write access" %}</h4>
+		<div class="card-body">
+			<p class="card-text">
+				{% blocktrans trimmed %}
+					You are allowed to push changes to the repository. However, each file added, modified or deleted by your commits is checked against the following rules. The first rule that matches the file's path determines whether the change is allowed or not. A push is rejected if it tries to alter files you have no write access to.
+				{% endblocktrans %}
+			</p>
+			<p class="card-text">
+				{% blocktrans trimmed %}
+					The asterisk (*) is a wildcard and matches anything.
+				{% endblocktrans %}
+			</p>
+		</div>
+		<table class="table table-hower table-responsive-md">
+			<thead class="thead-light">
+				<tr>
+					<th class="col-4" scope="col">
+						{% trans "Reference" %}
+						<div class="small">{% trans "the branch or tag you push to" %}</div>
+					</th>
+					<th class="col-7" scope="col">{% trans "Path" %}</th>
+					<th class="col-1" scope="col">{% trans "Write" %}</th>
+				</tr>
+			</thead>
+			{% for entry in git_acl %}
+				<tr>
+					<td>{{ entry.0 }}</td>
+					<td>{{ entry.1 }}</td>
+					<td>{{ entry.2|yesno }}</td>
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% else %}
+	<p class="card-text">
+		{% blocktrans trimmed %}
+			You only have read access to the repository and may not push any changes.
+		{% endblocktrans %}
+	</p>
+{% endif %}
+{% endblock %}

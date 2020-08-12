@@ -1,0 +1,69 @@
+{% extends "../base.html" %}
+
+{% block content %}
+<form class="m-0" method="GET">
+	<div class="navbar navbar-expand-xl navbar-light bg-info mb-2">
+		{# Dirty hack to get search field and buttons on same line on small screens #}
+			{% include "../snippets/form/field.html" with field=filter.form.search inline=True hide_label=True placeholder=filter.form.search.label %}
+			{% include "../snippets/form/field.html" with field=filter.form.term inline=True hide_label=True %}
+		<div class="collapse navbar-collapse" id="courseDirectoryFilterControls">
+			{% include "../snippets/form/field.html" with field=filter.form.study_course inline=True hide_label=True %}
+			{% include "../snippets/form/field.html" with field=filter.form.type inline=True hide_label=True %}
+			{% include "../snippets/form/field.html" with field=filter.form.language inline=True hide_label=True %}
+			{% if user.is_authenticated %}
+				{% include "../snippets/form/field.html" with field=filter.form.subscribed inline=True %}
+				{% include "../snippets/form/field.html" with field=filter.form.editor inline=True %}
+			{% endif %}
+		</div>
+		<button class="btn btn-info mx-2" type="submit" title="{% trans "Search" %}">
+			<i class="fas fa-search" aria-hidden="true"></i>
+		</button>
+		<button class="btn btn-info" type="button" data-toggle="collapse" data-target="#courseDirectoryFilterControls" aria-controls="courseDirectoryFilterControls" aria-expanded="false" title="{% trans "Toggle filter controls" %}">
+			<i class="fas fa-wrench" aria-hidden="true"></i>
+		</button>
+	</div>
+	{% include "../snippets/form/field.html" with field=filter.meta_form.page %}
+	{% include "../snippets/form/field.html" with field=filter.meta_form.page_size %}
+</form>
+
+{% include "../snippets/pagination.html" with filter=filter %}
+
+<table class="table table-hower table-responsive-md table-striped">
+	<thead class="thead-light">
+		<tr>
+			<th scope="col">{% trans "Course" %}</th>
+			<th class="col-2" scope="col">{% trans "Type of course" %}</th>
+			<th class="col-3" scope="col">{% trans "Course of study" %}</th>
+			<th class="col-3" scope="col">{% trans "Term" %}</th>
+			<th class="col-1" scope="col">
+				<span class="sr-only">{% trans "Material" %}</span>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for course in filter.page %}
+			<tr>
+				<th scope="row">
+					<a href="{{ course.get_absolute_url }}">{{ course.name }}</a>
+				</th>
+				<td>{{ course.type }}</td>
+				<td>{{ course.study_course }}</td>
+				<td>{{ course.term|or_dash }}</td>
+				<td>
+					{% if course.access_level >= AccessLevel.material %}
+						{% include "../snippets/course_material_buttons.html" with course=course include_sub_courses=True formats=formats %}
+					{% endif %}
+				</td>
+			</tr>
+		{% empty %}
+			<tr class="table-secondary">
+				<td class="text-center py-4" colspan="4">
+					{% trans "No course matches your query." %}
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% include "../snippets/pagination.html" with filter=filter %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% comment %}
+Shows the checkbox for accepting the privacy policy.
+
+The boolean form field has to be passed as form_field.
+{% endcomment %}
+
+<p class="card-text text-center">
+	{% as privacy_policy_link %}<a href="{% url "legal_notice" %}">{% trans "privacy policy" %}</a>{% endas %}
+	{% blocktrans trimmed %}
+		By proceeding, you confirm to have read and agree to the {{ privacy_policy_link }}.
+	{% endblocktrans %}
+	{% include "./form/field.html" with field=form_field wrapper_class="text-center" %}
+	{# Pre-check the checkbox if consent was given previously #}
+	{% if request.consents.privacy %}
+		<script>
+			$("#{{ form_field.auto_id }}").prop("checked", true);
+		</script>
+	{% endif %}
+</p>

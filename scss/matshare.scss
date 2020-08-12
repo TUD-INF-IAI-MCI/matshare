@@ -1,0 +1,18 @@
+// Override some defaults of bootstrap
+$theme-colors: (
+  "primary": #001bff,  // was #007bff
+);
+
+// Import complete bootstrap scss bundle
+@import "node_modules/bootstrap/scss/bootstrap";
+
+.navbar-dark .navbar-text {
+	color: color-yiq(theme-color("dark")) !important;
+}
+.navbar-dark .nav-link {
+	color: color("yellow") !important;
+}
+.navbar-dark .nav-link.active {
+	background-color: color("white") !important;
+	color: color("red") !important;
+}

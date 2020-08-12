@@ -1,0 +1,53 @@
+{% extends "../base.html" %}
+
+{% block h1 %}{% endblock %}
+
+{% block content %}
+<div class="card border-0">
+	<div class="card-header text-white bg-primary d-flex flex-wrap">
+		<div class="col-lg-6 col-xl-7 text-center">
+			<h1 class="mb-0">{{ object.name }}</h1>
+			<strong>
+				{{ object.type }}
+				&middot; {{ object.study_course.name }}
+				{% if object.term is not None %} &middot; {{ object.term }}{% endif %}
+			</strong>
+		</div>
+		<div class="col-lg-6 col-xl-5 align-self-end mt-2">
+			<ul class="nav nav-tabs card-header-tabs navbar-dark">
+				<li class="nav-item">
+					<a class="nav-link{% if view.is_course_overview %} active{% endif %}" href="{{ object.get_absolute_url }}" aria-expanded="{{ view.is_course_overview|boolstr }}">
+						{% trans "Overview" %}
+					</a>
+				</li>
+				{% if not object.is_static and access_level >= AccessLevel.ro %}
+					<li class="nav-item">
+						<a class="nav-link{% if view.is_course_sources %} active{% endif %}" href="{{ object.urls.course_sources }}" aria-expanded="{{ view.is_course_sources|boolstr }}">
+							{% trans "Sources" %}
+						</a>
+					</li>
+					{# Git is intentionally not supported via EasyAccess #}
+					{% if easy_access is None %}
+						<li class="nav-item">
+							<a class="nav-link{% if view.is_course_git %} active{% endif %}" href="{{ object.urls.course_git }}" aria-expanded="{{ view.is_course_git|boolstr }}">
+								{% trans "Git access" %}
+							</a>
+						</li>
+					{% endif %}
+				{% endif %}
+				{% if can_change_course %}
+					<li class="nav-item">
+						<a class="nav-link" href="{% url "admin:matshare_course_change" object_id=object.pk %}" aria-expanded="false">
+							{% trans "Settings" %}
+						</a>
+					</li>
+				{% endif %}
+			</ul>
+		</div>
+	</div>
+
+	<div class="card-body">
+		{% block course_detail_content %}{% endblock %}
+	</div>
+</div>
+{% endblock %}

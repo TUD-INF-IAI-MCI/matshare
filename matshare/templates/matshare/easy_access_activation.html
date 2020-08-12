@@ -1,0 +1,72 @@
+{% extends "./base.html" %}
+
+{% block h1 %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+	{% if easy_access is None %}
+
+		<div class="my-4 col-sm-10 col-md-7 col-lg-6 col-xl-5">
+			<div class="card bg-light border-primary">
+				<h1 class="card-header text-white bg-primary text-center">
+					{% trans "EasyAccess" %}
+				</h1>
+				<form class="my-0" method="POST">{% csrf_token %}
+					{% include "./snippets/form/non_field_errors.html" with form=form %}
+					<div class="card-body">
+						<p class="card-text">
+							{% blocktrans trimmed %}
+								Enter the e-mail address your invitation was sent to. In case you've got multiple addresses, be sure to enter the correct one.
+							{% endblocktrans %}
+						</p>
+						{% include "./snippets/form/field.html" with field=form.email hide_label=True placeholder=form.email.label %}
+						{% include "./snippets/privacy_policy_confirm.html" with form_field=form.privacy_policy_accepted %}
+					</div>
+					<div class="card-footer text-center text-md-right">
+						<button class="btn btn-primary" type="submit">
+							<i class="fas fa-step-forward mr-1" aria-hidden="true"></i>
+							{% trans "Proceed" %}
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+	{% else %}
+
+		<div class="my-4 col-sm-10 col-md-7 col-lg-6 col-xl-5">
+			<div class="card bg-light border-primary">
+				<h1 class="card-header text-white bg-primary text-center">
+					{% trans "Access granted" %}
+				</h1>
+				<div class="card-body">
+					<p class="card-text">
+						{% trans "You're now authorized to access the following course:" %}
+					</p>
+					<p class="card-text">
+						<div class="text-center">
+							{% include "./snippets/course_lead.html" with course=easy_access.course %}
+						</div>
+					</p>
+					<dl class="row">
+						<dt class="col-6">{% trans "Access level:" %}</dt>
+						<dd class="col-6">{{ easy_access.get_access_level_display }}</dd>
+						<dt class="col-6">{% trans "Expiration date:" %}</dt>
+						<dd class="col-6">{{ easy_access.expiration_date }}</dd>
+					</dl>
+					<p class="card-text">
+					{% blocktrans trimmed %}Maybe you want to bookmark this page; you'll need it to regain access at your next visit.{% endblocktrans %}
+					</p>
+				</div>
+				<div class="card-footer text-right">
+					<a class="btn btn-primary" href="{{ easy_access.course.get_absolute_url }}">
+						<i class="fas fa-step-forward mr-1" aria-hidden="true"></i>
+						{% trans "Proceed" %}
+					</a>
+				</div>
+			</div>
+		</div>
+
+	{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "./base.html" %}
+
+{% block content %}
+<p>
+	{% as course_link %}<a href="{{ MATSHARE_URL }}{{ subscription.course.get_absolute_url }}">{{ subscription.course }}</a>{% endas %}
+	{% blocktrans trimmed with course_link=course_link %}
+		New material is available for {{ course_link }}.
+	{% endblocktrans %}
+</p>
+
+<p>
+	<ul>
+		<li><a href="{{ MATSHARE_URL }}{{ subscription.course.urls.course_material_html }}">{% trans "View HTML online" %}</a></li>
+		<li>
+			{% trans "Download" %}:
+			{% for format in Format %}
+				<a href="{{ MATSHARE_URL }}{{ subscription.course.urls.course_material_download }}?format={{ format.name }}&include_sub_courses=1">{{ format.label }}</a>
+				{% if not forloop.last %}|{% endif %}
+			{% endfor %}
+		</li>
+	</ul>
+</p>
+
+<h2>{% trans "Latest changes" %}</h2>
+{% for course in subscription.unnotified_courses %}
+	<h3>{{ course }}</h3>
+	<ul>
+		{% for commit in course.latest_commits %}
+			<li>{% include "../snippets/git_commit.html" with commit=commit %}</li>
+		{% endfor %}
+	</ul>
+{% endfor %}
+{% endblock %}

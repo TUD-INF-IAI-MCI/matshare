@@ -1,0 +1,25 @@
+{# Pass form and optionally next as parameters #}
+
+<form action="{% url "login" %}" method="POST">{% csrf_token %}
+	<div class="card border-primary">
+		<h1 class="card-header text-white bg-primary text-center">{% trans "Sign in" %}</h1>
+		{% include "./form/non_field_errors.html" with form=form %}
+		<div class="card-body pb-2">
+			<input type="hidden" name="next" value="{{ next }}" />
+			{% include "./form/field.html" with field=form.username hide_label=True placeholder=form.username.label %}
+			{% include "./form/field.html" with field=form.password hide_label=True placeholder=form.password.label wrapper_class="mb-1" %}
+			{% if PASSWORD_RESET_ENABLED %}
+				<div class="text-right mb-2">
+					<a href="{% url "password_reset_request" %}">{% trans "Forgot your password?" %}</a>
+				</div>
+			{% endif %}
+			{% include "./privacy_policy_confirm.html" with form_field=form.privacy_policy_accepted %}
+		</div>
+		<div class="card-footer text-center">
+			<button class="btn btn-primary" type="submit">
+				<i class="fas fa-sign-in-alt mr-1" aria-hidden="true"></i>
+				{% trans "Sign in" %}
+			</button>
+		</div>
+	</div>
+</form>

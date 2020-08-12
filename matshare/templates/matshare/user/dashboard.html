@@ -1,0 +1,142 @@
+{% extends "../base.html" %}
+
+{% block h1 %}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{% blocktrans trimmed with name=user.get_short_name %}Welcome, {{ name }}!{% endblocktrans %}</h1>
+
+<div class="card bg-light border-info mb-4">
+	{% if subscriptions_with_new_material %}
+		<h4 class="card-header text-white bg-info text-center">{% trans "New material is available!" %}</h4>
+		<table class="table table-hower mb-2">
+			{% for sub in subscriptions_with_new_material %}
+				<tr>
+					<td class="align-middle text-center">
+						{% if sub.course.sub_courses.all %}
+							<button class="btn btn-sm btn-secondary" data-toggle="collapse" data-target="#subCoursesOf{{ sub.course.pk }}" aria-controls="subCoursesOf{{ sub.course.pk }}" aria-expanded="false" title="{% trans "Show/hide sub-courses" %}">
+								<i class="fas fa-plus" aria-hidden="true"></i>
+							</button>
+						{% endif %}
+					</td>
+					<th class="col-12 col-xs-12 align-middle px-0" scope="row">
+						{# If sub-courses exist, show times for them individually instead #}
+						{% include "../snippets/course_lead.html" with course=sub.course show_material_updated_last=sub.course.sub_courses.all|invert %}
+					</th>
+					<td class="align-middle">
+						{% include "../snippets/course_material_buttons.html" with course=sub.course formats=formats include_sub_courses=True %}
+					</td>
+				</tr>
+				{% if sub.course.sub_courses.all %}
+					<tbody id="subCoursesOf{{ sub.course.pk }}" class="collapse table-borderless table-sm">
+						{% for course in sub.undownloaded_courses %}
+							<tr class="table-secondary">
+								<td></td>
+								<th class="align-middle" scope="row">
+									{% include "../snippets/course_lead.html" with course=course show_material_updated_last=True %}
+								</th>
+								<td class="align-middle">
+									{% include "../snippets/course_material_buttons.html" with course=course formats=formats %}
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				{% endif %}
+			{% endfor %}
+		</table>
+	{% else %}
+		<h4 class="card-header text-center bg-success">
+			{% trans "Nothing new for you to download" %}
+		</h4>
+		<div class="card-body text-center">
+			<p class="card-text">
+				{% blocktrans trimmed %}
+					New material will be listed here once available.
+				{% endblocktrans %}
+			</p>
+		</div>
+	{% endif %}
+	<div class="card-footer text-center text-md-right">
+		<a href="{% url "course_directory" %}?subscribed=1&term=current">
+			{% trans "Show all courses you're subscribed to" %}
+			<i class="fas fa-angle-double-right ml-1" aria-hidden="true"></i>
+		</a>
+	</div>
+</div>
+
+{# Only show the card of edited courses if the user has ever edited one #}
+{% if is_editor %}
+	<div class="card bg-light border-info mb-4">
+		<h4 class="card-header text-white bg-info text-center">
+			{% trans "Courses you're editing" %}
+		</h4>
+		{% if active_editor_subscriptions %}
+			<ul class="list-group list-group-flush">
+				{% for sub in active_editor_subscriptions %}
+					<li class="list-group-item pt-1 pb-2">
+						{% include "../snippets/course_lead.html" with course=sub.course show_sources_updated_last=True %}
+					</li>
+				{% endfor %}
+			</ul>
+		{% else %}
+			<div class="card-body">
+				<p class="card-text">
+					{% blocktrans trimmed %}
+						You are no editor of a course for which editing is currently in progress.
+					{% endblocktrans %}
+				</p>
+			</div>
+		{% endif %}
+		<div class="card-footer text-center text-md-right">
+			<a href="{% url "course_directory" %}?editor=1">
+				{% trans "Show all courses you're editor of" %}
+				<i class="fas fa-angle-double-right ml-1" aria-hidden="true"></i>
+			</a>
+		</div>
+	</div>
+{% endif %}
+
+<div class="card bg-light border-info mb-4">
+	<h4 class="card-header text-white bg-info text-center">
+		<i class="fas fa-rss mr-1" aria-hidden="true"></i>
+		{% trans "Stay updated with your personal feed" %}
+	</h4>
+	<div class="card-body">
+		<p class="card-text">
+			{% blocktrans trimmed %}
+				If you like reading news feeds, MatShare can provide you with the material for courses you're subscribed to that way.
+			{% endblocktrans %}
+		</p>
+		<p class="card-text">
+			{% blocktrans trimmed %}
+				It's provided in the Atom format, which is supported by most feedreaders, and will notify you when new material for one of your courses is available. The download or online view is then just a click away.
+			{% endblocktrans %}
+		</p>
+		{% if is_editor %}
+			<p class="card-text">
+				{% blocktrans trimmed %}
+					Since you're an editor, there also is a feed which notifies you whenever sources have been uploaded to a course you're currently editing, so that you can start working straight away.
+				{% endblocktrans %}
+			</p>
+		{% endif %}
+		<p class="card-text">
+			{% as settings_link %}<a href="{% url "user_settings" %}">{% trans "settings" %}</a>{% endas %}
+			{% blocktrans trimmed with settings_link=settings_link %}
+				Note that if you're relying on the news feed to get notified about updates, you may want to consider disabling notification mails for all of your subscriptions in the {{ settings_link }} to avoid redundant notifications.
+			{% endblocktrans %}
+		</p>
+	</div>
+	<div class="card-footer d-flex justify-content-around align-items-center flex-wrap">
+		{% if is_editor %}
+			<a href="{{ user.absolute_editor_feed_url }}">
+				{% trans "Subscribe to your editor feed" %}
+				<i class="fas fa-angle-double-right ml-1" aria-hidden="true"></i>
+			</a>
+		{% endif %}
+		<a href="{{ user.absolute_student_feed_url }}">
+			{% trans "Subscribe to your material feed" %}
+			<i class="fas fa-angle-double-right ml-1" aria-hidden="true"></i>
+		</a>
+	</div>
+</div>
+
+{% endblock %}

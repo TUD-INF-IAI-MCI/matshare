@@ -1,0 +1,29 @@
+{% comment %}
+Pass a Course object as course.
+If show_material_updated_last is True, latest material updating time will be displayed.
+If show_sources_updated_last is True, latest material updating time will be displayed.
+{% endcomment %}
+
+<div class="font-weight-bold" style="font-size:1.3rem;">
+	<a href="{{ course.get_absolute_url }}">{{ course.name }}</a>
+</div>
+<div class="font-weight-bold small" style="margin-top:-0.3rem;">
+	{{ course.type }}
+	{% if course.term is not None %}&middot; {{ course.term }}{% endif %}
+	{% if show_material_updated_last %}
+		&middot;
+		<span class="sr-only">
+			{% blocktrans trimmed with when=course.material_updated_last|reltime %}last updated {{ when }}{% endblocktrans %}
+		</span>
+		<i class="fas fa-upload" style="font-size:0.75rem;" aria-hidden="true"></i>
+		<span aria-hidden="true">{{ course.material_updated_last|reltime }}</span>
+	{% endif %}
+	{% if show_sources_updated_last %}
+		&middot;
+		<span class="sr-only">
+			{% blocktrans trimmed with when=course.sources_updated_last|reltime %}last updated {{ when }}{% endblocktrans %}
+		</span>
+		<i class="fas fa-upload" style="font-size:0.75rem;" aria-hidden="true"></i>
+		<span aria-hidden="true">{{ course.material_updated_last|reltime }}</span>
+	{% endif %}
+</div>

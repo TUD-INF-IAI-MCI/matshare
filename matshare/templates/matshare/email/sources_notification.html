@@ -1,0 +1,17 @@
+{% extends "./base.html" %}
+
+{% block content %}
+<p>
+	{% as course_link %}<a href="{{ MATSHARE_URL }}{{ subscription.course.get_absolute_url }}">{{ subscription.course }}</a>{% endas %}
+	{% blocktrans trimmed with course_link=course_link %}
+		New sources are available for {{ course_link }}.
+	{% endblocktrans %}
+</p>
+
+<h2>{% trans "Latest changes" %}</h2>
+<ul>
+	{% for commit in subscription.course.latest_commits %}
+		<li>{% include "../snippets/git_commit.html" with commit=commit %}</li>
+	{% endfor %}
+</ul>
+{% endblock %}

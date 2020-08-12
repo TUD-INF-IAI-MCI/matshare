@@ -1,0 +1,52 @@
+{% comment %}
+This snippet generates a pagination bar to be shown above and/or below a list of
+filtered, paginated items.
+
+When the user changes page or page size, the form will automatically be submitted. The
+pagination bar <div/> will have a class of .pagination.
+    
+Including multiple of these pagination bars for the same filterset is supported.
+
+Parameters:
+* MatShareFilterSet filter:
+  The filterset to act on. This needs to be an instance of MatShareFilterSet.
+* bool force_show (False):
+  By default, the pagination bar will only be shown when the number of filtered
+  items is larger than the minimum selectable page size. Enable this setting to
+  always show the pagination bar regardless of the number of available items.
+{% endcomment %}
+
+
+{% if filter.pagination %}
+    {% with page=filter.page paginator=filter.paginator %}
+        {% if force_show or paginator.count > filter.min_page_size %}
+            <div class="row my-0 pagination" data-page-field="#{{ filter.meta_form.page.auto_id }}" data-page-size-field="#{{ filter.meta_form.page_size.auto_id }}">
+				<div class="col-sm-8 form-group text-center my-2">
+					{% if page.has_other_pages %}
+						<button type="submit" class="btn btn-sm btn-secondary" {% if page.has_previous %}name="{{ filter.meta_form.page.html_name }}" value="1"{% else %}disabled{% endif %} aria-label="{% trans "First page" %}">1&nbsp;&laquo;</button>
+						<button type="submit" class="btn btn-sm btn-secondary" {% if page.has_previous %}name="{{ filter.meta_form.page.html_name }}" value="{{ page.previous_page_number }}"{% else %}disabled{% endif %} aria-label="{% trans "Previous page" %}">&laquo;</button>
+						{% as page_field_id %}{% uuid %}{% endas %}
+						<label class="sr-only" for="{{ page_field_id }}">
+							{% trans "Page" %}:
+						</label>
+						<input id="{{ page_field_id }}" class="d-inline form-control form-control-sm page-select" style="max-width:6em;" type="number" min="1" max="{{ paginator.num_pages }}" value="{{ page.number }}"/>
+						<button type="submit" class="btn btn-sm btn-secondary" {% if page.has_next %}name="{{ filter.meta_form.page.html_name }}" value="{{ page.next_page_number }}"{% else %}disabled{% endif %} aria-label="{% trans "Next page" %}">&raquo;</button>
+						<button type="submit" class="btn btn-sm btn-secondary" {% if page.number < paginator.num_pages %}name="{{ filter.meta_form.page.html_name }}" value="{{ paginator.num_pages }}"{% else %}disabled{% endif %} aria-label="{% trans "Last page" %}">&raquo;&nbsp;{{ paginator.num_pages }}</button>
+					{% endif %}
+				</div>
+
+				<div class="col-sm-4 form-group text-center my-2">
+					{% as page_size_field_id %}{% uuid %}{% endas %}
+					<label class="form-label" for="{{ page_size_field_id }}">
+						{% trans "Items per page" %}:
+					</label>
+					<select id="{{ page_size_field_id }}" class="d-inline form-control form-control-sm page-size-select" style="max-width:6em;">
+						{% for value, label in filter.meta_form.page_size.field.choices %}
+							<option value="{{ value }}"{% if value == paginator.per_page %} selected{% endif %}>{{ label }}</option>
+						{% endfor %}
+					</select>
+				</div>
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endif %}

@@ -1,0 +1,14 @@
+/.*
+/Dockerfile
+/db.sqlite3
+/docker-compose.*
+/docs
+
+# Default docker-compose mountpoints
+/git_repos
+/media
+/pgdata
+
+# Python bytecode
+*.pyc
+__pycache__

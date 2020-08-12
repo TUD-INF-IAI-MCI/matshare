@@ -1,0 +1,6 @@
+{% comment %}
+Pass the dict obtained by matshare.git.utils.extract_git_info() as commit.
+{% endcomment %}
+
+<div>{{ commit.message|git_commit_message }}</div>
+<div><small>&mdash; <a href="mailto:{{ commit.author_email }}">{{ commit.author_name }}</a> @ {{ commit.author_time }}</small></div>

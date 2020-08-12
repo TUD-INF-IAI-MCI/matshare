@@ -1,0 +1,18 @@
+# temp and swap files
+*.swp
+*.swo
+*~
+*.tmp
+~$*
+
+# The matuc config is maintained by MatShare, never commit manual changes
+/edit/.lecture_meta_data.dcxml
+
+# Compiled material
+/edit/**/*.html
+/edit/**/*.epub
+/edit/**/eqn*.png
+/edit/**/eqn*.svg
+
+# Material building artifacts
+/edit/**/gladtex.cache
