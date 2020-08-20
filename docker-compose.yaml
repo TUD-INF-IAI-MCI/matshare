@@ -59,7 +59,6 @@ services:
       # Process up to this number of requests to git via HTTP concurrently
       #MS_GIT_ASYNC: 1
       # Your postgresql database connection
-      MS_DATABASE_ENGINE: django.db.backends.postgresql
       MS_DATABASE_HOST: "db"
       # Yes, we need to specify the port even though it's postgres's default
       MS_DATABASE_PORT: 5432

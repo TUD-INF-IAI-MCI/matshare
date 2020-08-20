@@ -157,10 +157,10 @@ WSGI_APPLICATION = "matshare.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": env.str("MS_DATABASE_ENGINE", "django.db.backends.sqlite3"),
+        "ENGINE": env.str("MS_DATABASE_ENGINE", "django.db.backends.postgresql"),
         "HOST": env.str("MS_DATABASE_HOST", ""),
         "PORT": env.str("MS_DATABASE_PORT", ""),
-        "NAME": env.str("MS_DATABASE_NAME", root("db.sqlite3")),
+        "NAME": env.str("MS_DATABASE_NAME", ""),
         "USER": env.str("MS_DATABASE_USER", ""),
         "PASSWORD": env.str("MS_DATABASE_PASSWORD", ""),
         "ATOMIC_REQUESTS": True,
