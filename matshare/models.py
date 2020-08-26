@@ -529,7 +529,7 @@ class Course(create_slug_mixin(max_length=150, unique=False), Model):
     )
 
     material_revision = models.CharField(
-        max_length=64, blank=True, verbose_name=_("latest revision of edit directory"),
+        max_length=64, blank=True, verbose_name=_("latest revision of edit directory")
     )
     material_updated_last = models.DateTimeField(
         null=True, blank=True, verbose_name=_("material updated last")

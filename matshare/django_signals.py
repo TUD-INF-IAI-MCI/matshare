@@ -68,7 +68,7 @@ def create_course_repository(sender, instance, created, **kwargs):
     browser = git_utils.ContentBrowser(repo)
     browser.add_from_fs(settings.MS_GIT_INITIAL_DIR)
     browser.commit(
-        git_utils.create_admin_signature(), "Initial commit", settings.MS_GIT_MAIN_REF,
+        git_utils.create_admin_signature(), "Initial commit", settings.MS_GIT_MAIN_REF
     )
 
 

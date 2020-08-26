@@ -316,8 +316,11 @@ class PasswordResetRequestView(PasswordResetViewMixin, MatShareViewMixin, Templa
                     user.password_reset_token = get_random_string(
                         User.password_reset_token.field.max_length
                     )
-                    user.password_reset_expiration_date = timezone.now() + datetime.timedelta(
-                        hours=settings.MS_PASSWORD_RESET_EXPIRATION_HOURS
+                    user.password_reset_expiration_date = (
+                        timezone.now()
+                        + datetime.timedelta(
+                            hours=settings.MS_PASSWORD_RESET_EXPIRATION_HOURS
+                        )
                     )
                     with user.localized():
                         MatShareEmailMessage(

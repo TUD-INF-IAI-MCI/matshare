@@ -333,12 +333,12 @@ class MatShareFilterSet(django_filters.FilterSet):
 
         # Allow filtering for specific pk's
         self.meta_form.fields["pk"] = TypedMultipleValueField(
-            coerce=int, required=False,
+            coerce=int, required=False
         )
 
         # Allow ticking a subset of the rows explicitly
         self.meta_form.fields["tick"] = TypedMultipleValueField(
-            coerce=int, required=False,
+            coerce=int, required=False
         )
 
         if "o" in self.filters and self.ordering_depth:
@@ -357,12 +357,12 @@ class MatShareFilterSet(django_filters.FilterSet):
                 widget=forms.HiddenInput(),
             )
             self.meta_form.fields["page"] = forms.IntegerField(
-                min_value=1, required=False, widget=forms.HiddenInput(),
+                min_value=1, required=False, widget=forms.HiddenInput()
             )
 
         # Helper field which is submitted when the filters should be cleared
         self.meta_form.fields["reset"] = forms.BooleanField(
-            required=False, widget=forms.HiddenInput(),
+            required=False, widget=forms.HiddenInput()
         )
         if self.meta_form["reset"].data:
             # Clear out all query data related to this filterset
@@ -375,10 +375,10 @@ class MatShareFilterSet(django_filters.FilterSet):
 
         # Helper fields for selecting/deselecting all items across pages
         self.meta_form.fields["select_all"] = forms.BooleanField(
-            required=False, widget=forms.HiddenInput(),
+            required=False, widget=forms.HiddenInput()
         )
         self.meta_form.fields["deselect_all"] = forms.BooleanField(
-            required=False, widget=forms.HiddenInput(),
+            required=False, widget=forms.HiddenInput()
         )
 
     def filter_queryset(self, queryset):
