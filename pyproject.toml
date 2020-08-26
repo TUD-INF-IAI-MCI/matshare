@@ -32,4 +32,4 @@ rules = "~=2.2"
 uwsgi_tasks = "~=0.7"
 
 [tool.poetry.dev-dependencies]
-black = ">=19.10b0"
+black = "^20.8b0"
