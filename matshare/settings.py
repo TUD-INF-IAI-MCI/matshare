@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import urllib.parse
 
 from django.conf.global_settings import LANGUAGES as AVAILABLE_DJANGO_LANGUAGES
 from django.core.exceptions import ImproperlyConfigured
@@ -226,8 +227,17 @@ STATIC_URL = env.str("MS_STATIC_URL", "/static/")
 
 
 # Absolute URL under which MatShare is accessible to the public
+MS_URL = env.str("MS_URL", "https://my-domain").rstrip("/")
 
-MS_ROOT_URL = env.str("MS_ROOT_URL", "https://my-domain").rstrip("/")
+# URL to the root of the webserver running MatShare
+spl = urllib.parse.urlsplit(MS_URL)
+MS_ROOT_URL = urllib.parse.urlunsplit(
+    (spl.scheme, spl.netloc, "", spl.query, spl.fragment)
+)
+
+# uWSGI always mounts Matshare in /, but we want the URL reverser to return correct
+# values
+FORCE_SCRIPT_NAME = spl.path
 
 
 # E-mail settings

@@ -16,7 +16,7 @@ def matshare_context_processor(request=None):
 
     return {
         "CONTACT_EMAIL": settings.MS_CONTACT_EMAIL,
-        "MATSHARE_URL": settings.MS_ROOT_URL,
+        "MATSHARE_ROOT_URL": settings.MS_ROOT_URL,
         "MATSHARE_VERSION": __version__,
         "PASSWORD_RESET_ENABLED": settings.MS_PASSWORD_RESET,
         "AccessLevel": Course.AccessLevel,

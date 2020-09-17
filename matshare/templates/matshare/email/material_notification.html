@@ -2,7 +2,7 @@
 
 {% block content %}
 <p>
-	{% as course_link %}<a href="{{ MATSHARE_URL }}{{ subscription.course.get_absolute_url }}">{{ subscription.course }}</a>{% endas %}
+	{% as course_link %}<a href="{{ MATSHARE_ROOT_URL }}{{ subscription.course.get_absolute_url }}">{{ subscription.course }}</a>{% endas %}
 	{% blocktrans trimmed with course_link=course_link %}
 		New material is available for {{ course_link }}.
 	{% endblocktrans %}
@@ -10,11 +10,11 @@
 
 <p>
 	<ul>
-		<li><a href="{{ MATSHARE_URL }}{{ subscription.course.urls.course_material_html }}">{% trans "View HTML online" %}</a></li>
+		<li><a href="{{ MATSHARE_ROOT_URL }}{{ subscription.course.urls.course_material_html }}">{% trans "View HTML online" %}</a></li>
 		<li>
 			{% trans "Download" %}:
 			{% for format in Format %}
-				<a href="{{ MATSHARE_URL }}{{ subscription.course.urls.course_material_download }}?format={{ format.name }}&include_sub_courses=1">{{ format.label }}</a>
+				<a href="{{ MATSHARE_ROOT_URL }}{{ subscription.course.urls.course_material_download }}?format={{ format.name }}&include_sub_courses=1">{{ format.label }}</a>
 				{% if not forloop.last %}|{% endif %}
 			{% endfor %}
 		</li>

@@ -11,7 +11,7 @@ services:
       #MS_DEBUG_LOGGERS: "matshare,django.request"
       MS_SECRET_KEY: something unsecure for development
       MS_TIME_ZONE: Europe/Berlin
-      MS_ROOT_URL: http://dd.dyn.efficiosoft.com:58080
+      MS_URL: http://dd.dyn.efficiosoft.com:58080
       MS_DEFAULT_FROM_EMAIL: "MatShare <matshare@shajil.de>"
       MS_EMAIL_HOST: 10.64.0.1
       MS_COURSE_CONTRIBUTOR: AG SBS

@@ -2,7 +2,7 @@
 
 {% block content %}
 <p>
-	{% as course_link %}<a href="{{ MATSHARE_URL }}{{ subscription.course.get_absolute_url }}">{{ subscription.course }}</a>{% endas %}
+	{% as course_link %}<a href="{{ MATSHARE_ROOT_URL }}{{ subscription.course.get_absolute_url }}">{{ subscription.course }}</a>{% endas %}
 	{% blocktrans trimmed with course_link=course_link %}
 		New sources are available for {{ course_link }}.
 	{% endblocktrans %}

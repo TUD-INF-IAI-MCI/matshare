@@ -29,7 +29,7 @@ services:
       #MS_TIME_ZONE: America/Chicago
       # URL under which MatShare is accessible to the public. This will, for instance,
       # be used in emails.
-      #MS_ROOT_URL: http://localhost:8000
+      #MS_URL: http://localhost:8000
       # Settings regarding e-mail sending
       #MS_DEFAULT_FROM_EMAIL: "MatShare <my-email@my-domain>"
       # Set in Reply-To header of sent emails
