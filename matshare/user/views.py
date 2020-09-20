@@ -52,7 +52,9 @@ class DashboardView(LoginRequiredMixin, MatShareViewMixin, TemplateView):
                 .with_prefetching()
             )
         student_subscriptions = ctx["student_subscriptions"] = list(
-            CourseStudentSubscription.objects.filter(user=self.request.user)
+            CourseStudentSubscription.objects.filter(
+                user=self.request.user, active=True
+            )
             .order_by("course__name", "course__type__name")
             .with_prefetching()
         )
@@ -74,7 +76,7 @@ class FeedViewBase(View):
         with user.localized():
             gen = FeedGenerator()
             gen.generator(
-                generator="MatShare", version=__version__, uri=settings.MS_ROOT_URL
+                generator="MatShare", version=__version__, uri=settings.MS_URL
             )
             gen.author(name="MatShare", email=settings.MS_CONTACT_EMAIL)
             gen.link(
@@ -151,7 +153,7 @@ class StudentFeedView(FeedViewBase):
             _("Material updates for {full_name}").format(full_name=user.get_full_name())
         )
         student_subscriptions = CourseStudentSubscription.objects.filter(
-            user=user
+            user=user, active=True
         ).with_prefetching()
         for sub in student_subscriptions:
             entry = gen.add_entry()

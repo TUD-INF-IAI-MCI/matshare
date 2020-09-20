@@ -56,8 +56,8 @@
 		</div>
 	{% endif %}
 	<div class="card-footer text-center text-md-right">
-		<a href="{% url "course_directory" %}?subscribed=1&term=current">
-			{% trans "Show all courses you're subscribed to" %}
+		<a href="{% url "course_directory" %}?subscription=active">
+			{% trans "Show all courses you're actively subscribed to" %}
 			<i class="fas fa-angle-double-right ml-1" aria-hidden="true"></i>
 		</a>
 	</div>

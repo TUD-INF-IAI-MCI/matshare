@@ -90,6 +90,7 @@
 							{% endblocktrans %}
 						</p>
 					{% endif %}
+					{% include "../snippets/form/field.html" with field=student_subscription_form.active %}
 					{% include "../snippets/form/field.html" with field=student_subscription_form.notification_frequency %}
 					<div class="text-center text-md-right">
 						{% if student_subscription is None %}

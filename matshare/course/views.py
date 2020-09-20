@@ -125,7 +125,7 @@ class DirectoryView(MatShareViewMixin, django_filters.views.FilterView):
                 "term",
                 "language",
                 "editor",
-                "subscribed",
+                "subscription",
             )
 
         search = django_filters.CharFilter(method="filter_search", label=_("Search"))
@@ -149,10 +149,15 @@ class DirectoryView(MatShareViewMixin, django_filters.views.FilterView):
         language = django_filters.ChoiceFilter(
             choices=Course.language.field.choices, empty_label=_("All languages")
         )
-        subscribed = django_filters.BooleanFilter(
-            method="filter_subscribed",
-            widget=forms.CheckboxInput(),
-            label=_("Only courses I'm subscribed to"),
+        subscription = django_filters.ChoiceFilter(
+            method="filter_subscription",
+            choices=(
+                ("no", _("Courses I'm not subscribed to")),
+                ("active", _("Courses I'm actively subscribed to")),
+                ("yes", _("All courses I'm subscribed to")),
+            ),
+            empty_label=_("Subscription status"),
+            label=_("Subscription status"),
         )
         editor = django_filters.BooleanFilter(
             method="filter_editor",
@@ -181,9 +186,17 @@ class DirectoryView(MatShareViewMixin, django_filters.views.FilterView):
         def filter_search(self, queryset, name, value):
             return watson.search.filter(queryset, value)
 
-        def filter_subscribed(self, queryset, name, value):
+        def filter_subscription(self, queryset, name, value):
             if not value or not self.request.user.is_authenticated:
                 return queryset
+            if value == "no":
+                return queryset.exclude(students=self.request.user)
+            if value == "active":
+                return queryset.filter(
+                    student_subscriptions__user=self.request.user,
+                    student_subscriptions__active=True,
+                )
+            assert value == "yes"
             return queryset.filter(students=self.request.user)
 
     filterset_class = DirectoryFilterSet
@@ -768,7 +781,7 @@ class StudentSubscriptionView(LoginRequiredMixin, SingleCourseViewMixin, View):
     class SubscriptionForm(forms.ModelForm):
         class Meta:
             model = CourseStudentSubscription
-            fields = ("notification_frequency",)
+            fields = ("active", "notification_frequency")
 
     min_access_level = Course.AccessLevel.material
 

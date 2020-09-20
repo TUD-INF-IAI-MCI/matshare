@@ -38,6 +38,7 @@ def _send_editor_notifications(notification_frequency):
         User.objects.filter(
             is_active=True,
             sources_notification_frequency=notification_frequency,
+            editor_subscriptions__course__editing_status=Course.EditingStatus.in_progress,
             editor_subscriptions__needs_notification=True,
         )
         .distinct()
@@ -47,7 +48,9 @@ def _send_editor_notifications(notification_frequency):
         with transaction.atomic():
             for sub in (
                 CourseEditorSubscription.objects.filter(
-                    user=user, needs_notification=True
+                    user=user,
+                    course__editing_status=Course.EditingStatus.in_progress,
+                    needs_notification=True,
                 )
                 .with_prefetching()
                 .select_related("user")
@@ -60,7 +63,9 @@ def _send_editor_notifications(notification_frequency):
 def _send_student_notifications(notification_frequency):
     for user in (
         User.objects.filter(
-            is_active=True, student_subscriptions__needs_notification=True
+            is_active=True,
+            student_subscriptions__active=True,
+            student_subscriptions__needs_notification=True,
         )
         .distinct()
         .iterator()
@@ -70,6 +75,7 @@ def _send_student_notifications(notification_frequency):
             for sub in (
                 CourseStudentSubscription.objects.filter(
                     user=user,
+                    active=True,
                     notification_frequency=notification_frequency,
                     needs_notification=True,
                 )

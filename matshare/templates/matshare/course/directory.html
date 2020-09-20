@@ -11,7 +11,7 @@
 			{% include "../snippets/form/field.html" with field=filter.form.type inline=True hide_label=True %}
 			{% include "../snippets/form/field.html" with field=filter.form.language inline=True hide_label=True %}
 			{% if user.is_authenticated %}
-				{% include "../snippets/form/field.html" with field=filter.form.subscribed inline=True %}
+				{% include "../snippets/form/field.html" with field=filter.form.subscription inline=True hide_label=True %}
 				{% include "../snippets/form/field.html" with field=filter.form.editor inline=True %}
 			{% endif %}
 		</div>

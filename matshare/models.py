@@ -744,7 +744,7 @@ class Course(create_slug_mixin(max_length=150, unique=False), Model):
             and (
                 self.material_audience == self.Audience.users
                 or self.material_audience == self.Audience.study_course
-                and self.study_course in users.study_courses.all()
+                and self.study_course in user.study_courses.all()
             )
         ):
             return self.AccessLevel.material, None
@@ -1027,6 +1027,7 @@ class CourseStudentSubscription(Model):
     """
 
     class Meta:
+        index_together = (("course", "user", "active"),)
         unique_together = (("course", "user"),)
         rules_permissions = {
             "add": rules.is_staff,
@@ -1054,6 +1055,17 @@ class CourseStudentSubscription(Model):
         exclude=(Course.AccessLevel.none, Course.AccessLevel.metadata),
         default=Course.AccessLevel.material,
         verbose_name=_("access level"),
+    )
+    active = models.BooleanField(
+        default=True,
+        help_text=_(
+            "When you've finished a course, make its subscription inactive. "
+            "Inactive subscriptions don't trigger material notification mails and "
+            "the course won't appear in dashboard and material feed. However, you "
+            "will retain your permission to access the course and its material "
+            "via the course directory."
+        ),
+        verbose_name=_("active"),
     )
     notification_frequency = IntegerEnumField(
         NotificationFrequency,
