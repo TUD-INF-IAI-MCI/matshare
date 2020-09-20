@@ -1,7 +1,5 @@
-#!/bin/sh
+#!/bin/sh -e
 # The docker main command.
-
-set -e
 
 echo '
 *********************
