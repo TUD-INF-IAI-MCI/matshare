@@ -366,7 +366,6 @@ class Course(create_slug_mixin(max_length=150, unique=False), Model):
                 name="%(app_label)s_%(class)s_is_static_coherency",
             ),
         )
-        index_together = (("study_course", "term", "type", "slug"),)
         verbose_name = _("course")
         verbose_name_plural = _("courses")
         rules_permissions = {
@@ -1027,7 +1026,10 @@ class CourseStudentSubscription(Model):
     """
 
     class Meta:
-        index_together = (("course", "user", "active"),)
+        index_together = (
+            # Used for finding subscriptions for notification sending
+            ("user", "active"),
+        )
         unique_together = (("course", "user"),)
         rules_permissions = {
             "add": rules.is_staff,
