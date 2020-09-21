@@ -249,8 +249,14 @@ class SettingsView(LoginRequiredMixin, MatShareViewMixin, TemplateView):
 
         update_material_notification_frequencies = forms.BooleanField(
             required=False,
+            help_text=(
+                "If you don't check this box, the material notifications for "
+                "courses you're subscribed to will continue to be sent with the "
+                "frequency you previously selected for each course individually."
+            ),
             label=_(
-                "Also use this notification frequency for courses I've subscribed to already."
+                "Also configure this notification frequency for all the courses I'm "
+                "subscribed to already."
             ),
         )
 

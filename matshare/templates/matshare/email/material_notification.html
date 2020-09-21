@@ -30,4 +30,15 @@
 		{% endfor %}
 	</ul>
 {% endfor %}
+
+<p>
+	{% as course_link %}<a href="{{ MATSHARE_ROOT_URL }}{{ subscription.course.get_absolute_url }}">{% trans "course page" %}</a>{% endas %}
+	{% blocktrans trimmed with course_link=course_link %}
+		If you no longer wish to receive notifications for this course, you can make your subscription inactive or change the frequency of e-mails on the {{ course_link }}.
+	{% endblocktrans %}
+	{% as settings_link %}<a href="{{ MATSHARE_ROOT_URL }}{% url "user_settings" %}">{% trans "settings" %}</a>{% endas %}
+	{% blocktrans trimmed with settings_link=settings_link %}
+		You can also choose to never receive notifications about new material for all the courses you're subscribed to at once in the {{ settings_link }}.
+	{% endblocktrans %}
+</p>
 {% endblock %}
