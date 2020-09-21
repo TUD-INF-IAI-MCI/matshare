@@ -17,7 +17,7 @@ OID_PATTERN = re.compile(r"^(?:[a-f0-9]{40}|[a-f0-9]{64})$")
 
 def create_admin_signature():
     """Returns a :class:`pygit2.Signature` object to use for administrative commits."""
-    return create_signature("MatShare", settings.MS_GIT_ADMIN_EMAIL)
+    return create_signature("MatShare System", settings.MS_GIT_ADMIN_EMAIL)
 
 
 def create_signature(name, email):
