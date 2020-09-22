@@ -64,54 +64,6 @@
 				{% endif %}
 			</dl>
 		</div>
-		{% if student_subscription_form is not None %}
-			<div class="card-body pt-0">
-				<h5 class="card-title">
-					{% if student_subscription is None %}
-						{% trans "Subscribe for material updates" %}
-					{% else %}
-						{% trans "Manage your subscription" %}
-					{% endif %}
-				</h5>
-				<form class="m-0" action="{{ object.urls.course_student_subscription }}" method="POST">{% csrf_token %}
-					{% if student_subscription is None %}
-						<p class="card-text">
-							{% blocktrans trimmed %}
-								You're allowed to subscribe to this course.
-							{% endblocktrans %}
-							{% blocktrans trimmed %}
-								Subscribed students can choose to get notified by mail whenever new material is available and have the course listed on both their personal dashboard and news feed for quick access.
-							{% endblocktrans %}
-						</p>
-					{% else %}
-						<p class="card-text">
-							{% blocktrans trimmed %}
-								You're subscribed to this course for material updates and may update subscription-related settings here.
-							{% endblocktrans %}
-						</p>
-					{% endif %}
-					{% include "../snippets/form/field.html" with field=student_subscription_form.active %}
-					{% include "../snippets/form/field.html" with field=student_subscription_form.notification_frequency %}
-					<div class="text-center text-md-right">
-						{% if student_subscription is None %}
-							<button class="btn btn-primary ml-md-auto m-2 my-md-0" type="submit">
-								{% trans "Subscribe" %}
-							</button>
-						{% else %}
-							<button class="btn btn-primary ml-md-auto m-2 my-md-0" type="submit">
-								{% trans "Update subscription" %}
-							</button>
-							<button id="unsubscribeButton" class="btn btn-danger m-2 my-md-0" type="submit" name="unsubscribe" value="1">
-								{% trans "Unsubscribe me" %}
-							</button>
-							<script>
-								{% include "./overview_confirm_unsubscribe.js" %}
-							</script>
-						{% endif %}
-					</div>
-				</form>
-			</div>
-		{% endif %}
 	</div>
 {% else %}
 	<div class="card bg-warning border-warning mb-4" role="alert">

@@ -20,6 +20,13 @@
 						{% trans "Overview" %}
 					</a>
 				</li>
+				{% if user.is_authenticated and access_level >= AccessLevel.material %}
+					<li class="nav-item">
+						<a class="nav-link{% if view.is_course_subscription %} active{% endif %}" href="{{ object.urls.course_subscription }}" aria-expanded="{{ view.is_course_subscription|boolstr }}">
+							{% trans "Subscription" %}
+						</a>
+					</li>
+				{% endif %}
 				{% if not object.is_static and access_level >= AccessLevel.ro %}
 					<li class="nav-item">
 						<a class="nav-link{% if view.is_course_sources %} active{% endif %}" href="{{ object.urls.course_sources }}" aria-expanded="{{ view.is_course_sources|boolstr }}">
@@ -30,7 +37,7 @@
 					{% if easy_access is None %}
 						<li class="nav-item">
 							<a class="nav-link{% if view.is_course_git %} active{% endif %}" href="{{ object.urls.course_git }}" aria-expanded="{{ view.is_course_git|boolstr }}">
-								{% trans "Git access" %}
+								{% trans "Git" %}
 							</a>
 						</li>
 					{% endif %}

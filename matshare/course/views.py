@@ -247,7 +247,7 @@ class GitView(CourseDetailViewBase):
         return ctx
 
     def get_title_parts(self):
-        return (_("Git access"), *super().get_title_parts())
+        return (_("Git"), *super().get_title_parts())
 
 
 class MaterialViewBase(CourseDetailViewBase):
@@ -497,27 +497,6 @@ class OverviewView(CourseDetailViewBase):
         ctx["sub_courses"] = sorted(
             self.object.sub_courses.all(), key=lambda c: (c.name, c.type.name)
         )
-        # Provide facilities for self-subscribing and updating subscription settings
-        sub = None
-        if (
-            self.request.user.is_authenticated
-            and self.access_level >= Course.AccessLevel.material
-        ):
-            try:
-                sub = CourseStudentSubscription.objects.get(
-                    course=self.object, user=self.request.user
-                )
-            except CourseStudentSubscription.DoesNotExist:
-                pass
-            ctx["student_subscription_form"] = StudentSubscriptionView.SubscriptionForm(
-                initial={
-                    "notification_frequency": self.request.user.default_material_notification_frequency
-                },
-                instance=sub,
-            )
-        else:
-            ctx["student_subscription_form"] = None
-        ctx["student_subscription"] = sub
         return ctx
 
     def get_queryset(self):
@@ -777,7 +756,8 @@ class SourcesView(CourseDetailViewBase):
         return pygit2.Repository(self.object.absolute_repository_path)
 
 
-class StudentSubscriptionView(LoginRequiredMixin, SingleCourseViewMixin, View):
+@method_decorator(never_cache, name="dispatch")
+class SubscriptionView(CourseDetailViewBase):
     """
     Allows a user to subscribe/unsubscribe himself to/from a course.
     """
@@ -787,7 +767,37 @@ class StudentSubscriptionView(LoginRequiredMixin, SingleCourseViewMixin, View):
             model = CourseStudentSubscription
             fields = ("active", "notification_frequency")
 
+    template_name = "matshare/course/subscription.html"
     min_access_level = Course.AccessLevel.material
+    is_course_subscription = True
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        # Provide facilities for self-subscribing and updating subscription settings
+        sub = None
+        if (
+            self.request.user.is_authenticated
+            and self.access_level >= Course.AccessLevel.material
+        ):
+            try:
+                sub = CourseStudentSubscription.objects.get(
+                    course=self.object, user=self.request.user
+                )
+            except CourseStudentSubscription.DoesNotExist:
+                pass
+            ctx["form"] = self.SubscriptionForm(
+                initial={
+                    "notification_frequency": self.request.user.default_material_notification_frequency
+                },
+                instance=sub,
+            )
+        else:
+            ctx["form"] = None
+        ctx["subscription"] = sub
+        return ctx
+
+    def get_title_parts(self):
+        return (_("Manage subscription"), *super().get_title_parts())
 
     def post(self, request):
         if request.POST.get("unsubscribe"):

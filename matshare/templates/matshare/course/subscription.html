@@ -1,0 +1,41 @@
+{% extends "./detail_base.html" %}
+
+{% block course_detail_content %}
+<form class="m-0" method="POST">{% csrf_token %}
+	{% if subscription is None %}
+		<p class="card-text">
+			{% blocktrans trimmed %}
+				You're allowed to subscribe to this course.
+			{% endblocktrans %}
+			{% blocktrans trimmed %}
+				Subscribed students can choose to get notified by mail whenever new material is available and have the course listed on both their personal dashboard and news feed for quick access.
+			{% endblocktrans %}
+		</p>
+	{% else %}
+		<p class="card-text">
+			{% blocktrans trimmed %}
+				You're subscribed to this course for material updates and may update subscription-related settings here.
+			{% endblocktrans %}
+		</p>
+	{% endif %}
+	{% include "../snippets/form/field.html" with field=form.active %}
+	{% include "../snippets/form/field.html" with field=form.notification_frequency %}
+	<div class="text-center text-md-right">
+		{% if subscription is None %}
+			<button class="btn btn-primary ml-md-auto m-2 my-md-0" type="submit">
+				{% trans "Subscribe" %}
+			</button>
+		{% else %}
+			<button class="btn btn-primary ml-md-auto m-2 my-md-0" type="submit">
+				{% trans "Save" %}
+			</button>
+			<button id="unsubscribeButton" class="btn btn-danger m-2 my-md-0" type="submit" name="unsubscribe" value="1">
+				{% trans "Unsubscribe me" %}
+			</button>
+			<script>
+				{% include "./subscription_confirm_unsubscribe.js" %}
+			</script>
+		{% endif %}
+	</div>
+</form>
+{% endblock %}

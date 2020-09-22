@@ -32,9 +32,9 @@
 {% endfor %}
 
 <p>
-	{% as course_link %}<a href="{{ MATSHARE_ROOT_URL }}{{ subscription.course.get_absolute_url }}">{% trans "course page" %}</a>{% endas %}
-	{% blocktrans trimmed with course_link=course_link %}
-		If you no longer wish to receive notifications for this course, you can make your subscription inactive or change the frequency of e-mails on the {{ course_link }}.
+	{% as subscription_link %}<a href="{{ MATSHARE_ROOT_URL }}{{ subscription.course.urls.course_subscription }}">{% trans "subscription page" %}</a>{% endas %}
+	{% blocktrans trimmed with subscription_link=subscription_link %}
+		If you no longer wish to receive notifications for this course, you can make your subscription inactive or change the frequency of e-mails on the {{ subscription_link }}.
 	{% endblocktrans %}
 	{% as settings_link %}<a href="{{ MATSHARE_ROOT_URL }}{% url "user_settings" %}">{% trans "settings" %}</a>{% endas %}
 	{% blocktrans trimmed with settings_link=settings_link %}

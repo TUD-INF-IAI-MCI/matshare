@@ -39,8 +39,8 @@ urlpatterns = [
     ),
     # Self-subscription and subscription settings
     path(
-        f"{SLUG_PATH}/student-subscription/",
-        views.StudentSubscriptionView.as_view(),
-        name="course_student_subscription",
+        f"{SLUG_PATH}/subscription/",
+        views.SubscriptionView.as_view(),
+        name="course_subscription",
     ),
 ]
