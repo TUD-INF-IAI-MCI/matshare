@@ -11,7 +11,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.core.validators import RegexValidator
-from django.http import FileResponse, Http404, HttpResponseRedirect, QueryDict
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
+    QueryDict,
+)
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -506,8 +512,6 @@ class OverviewView(CourseDetailViewBase):
             ctx["student_subscription_form"] = StudentSubscriptionView.SubscriptionForm(
                 initial={
                     "notification_frequency": self.request.user.default_material_notification_frequency
-                    if sub is None
-                    else sub.notification_frequency
                 },
                 instance=sub,
             )
@@ -806,7 +810,7 @@ class StudentSubscriptionView(LoginRequiredMixin, SingleCourseViewMixin, View):
                 )
             form = self.SubscriptionForm(request.POST, instance=sub)
             if not form.is_valid():
-                raise PermissionDenied
+                return HttpResponseBadRequest()
             form.save()
             messages.success(
                 request,
