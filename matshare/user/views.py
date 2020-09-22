@@ -276,7 +276,7 @@ class SettingsView(LoginRequiredMixin, MatShareViewMixin, TemplateView):
             return instance
 
     template_name = "matshare/user/settings.html"
-    title = _("My Settings")
+    title = _("My settings")
     is_user_settings = True
 
     def get(self, request, password_form=None, settings_form=None):
