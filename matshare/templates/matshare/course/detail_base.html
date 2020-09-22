@@ -17,27 +17,42 @@
 			<ul class="nav nav-tabs card-header-tabs navbar-dark">
 				<li class="nav-item">
 					<a class="nav-link{% if view.is_course_overview %} active{% endif %}" href="{{ object.get_absolute_url }}" aria-expanded="{{ view.is_course_overview|boolstr }}">
-						{% trans "Overview" %}
+						<i class="fas fa-home" aria-hidden="true"></i>
+						<span class="ml-1">{% trans "Overview" %}</span>
 					</a>
 				</li>
 				{% if user.is_authenticated and access_level >= AccessLevel.material %}
 					<li class="nav-item">
 						<a class="nav-link{% if view.is_course_subscription %} active{% endif %}" href="{{ object.urls.course_subscription }}" aria-expanded="{{ view.is_course_subscription|boolstr }}">
-							{% trans "Subscription" %}
+							<i class="fas fa-envelope-square" aria-hidden="true"></i>
+							<span class="ml-1">{% trans "Subscription" %}</span>
+							{% if subscription is None %}
+								<form class="d-inline m-0" action="{{ object.urls.course_subscription }}" method="POST">{% csrf_token %}
+									<input type="hidden" name="active" value="1">
+									<input type="hidden" name="notification_frequency" value="{{ user.default_material_notification_frequency.value }}">
+									<button class="btn btn-link border-0 ml-1 mr-0 my-0 p-0" type="submit" title="{% trans "Subscribe" %}">
+										<i class="fas fa-plus" aria-hidden="true"></i>
+									</button>
+								</form>
+							{% elif not subscription.active %}
+								<span class="mark small ml-1">{% trans "inactive" %}</span>
+							{% endif %}
 						</a>
 					</li>
 				{% endif %}
 				{% if not object.is_static and access_level >= AccessLevel.ro %}
 					<li class="nav-item">
 						<a class="nav-link{% if view.is_course_sources %} active{% endif %}" href="{{ object.urls.course_sources }}" aria-expanded="{{ view.is_course_sources|boolstr }}">
-							{% trans "Sources" %}
+							<i class="fas fa-file" aria-hidden="true"></i>
+							<span class="ml-1">{% trans "Source upload" %}</span>
 						</a>
 					</li>
 					{# Git is intentionally not supported via EasyAccess #}
 					{% if easy_access is None %}
 						<li class="nav-item">
 							<a class="nav-link{% if view.is_course_git %} active{% endif %}" href="{{ object.urls.course_git }}" aria-expanded="{{ view.is_course_git|boolstr }}">
-								{% trans "Git" %}
+								<i class="fas fa-archive" aria-hidden="true"></i>
+								<span class="ml-1">{% trans "Git" %}</span>
 							</a>
 						</li>
 					{% endif %}
@@ -45,7 +60,8 @@
 				{% if can_change_course %}
 					<li class="nav-item">
 						<a class="nav-link" href="{% url "admin:matshare_course_change" object_id=object.pk %}" aria-expanded="false">
-							{% trans "Settings" %}
+							<i class="fas fa-hammer" aria-hidden="true"></i>
+							<span class="ml-1">{% trans "Settings" %}</span>
 						</a>
 					</li>
 				{% endif %}

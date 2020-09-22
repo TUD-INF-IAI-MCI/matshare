@@ -110,6 +110,17 @@ class CourseDetailViewBase(MatShareViewMixin, SingleCourseViewMixin, TemplateVie
         ctx["can_change_course"] = self.request.user.has_perm(
             self.object.get_perm("change"), self.object
         )
+        # For showing subscription status in navigation menu
+        if (
+            self.request.user.is_authenticated
+            and self.access_level >= Course.AccessLevel.material
+        ):
+            try:
+                ctx["subscription"] = CourseStudentSubscription.objects.get(
+                    course=self.object, user=self.request.user
+                )
+            except CourseStudentSubscription.DoesNotExist:
+                ctx["subscription"] = None
         return ctx
 
     def get_title_parts(self):
