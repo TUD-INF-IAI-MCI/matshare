@@ -11,6 +11,10 @@ from django.contrib.admin.widgets import (
     url_params_from_lookup_dict,
 )
 from django.contrib.auth.admin import UserAdmin as _UserAdmin
+from django.contrib.auth.forms import (
+    AdminPasswordChangeForm as _AdminPasswordChangeForm,
+    UserCreationForm as _UserCreationForm,
+)
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
@@ -577,6 +581,73 @@ class UserAdmin(rules_admin.ObjectPermissionsModelAdminMixin, _UserAdmin):
     and should be retained.
     """
 
+    class UnusablePasswordMixin:
+        """
+        Mixin for forms with password1 and password2 field. It allows setting unusable
+        password by leaving both fields empty. The two fields have to be redefined
+        with required=False by the class using this mixin.
+        """
+
+        def clean(self):
+            cleaned = super().clean()
+            pw1 = cleaned.get("password1")
+            pw2 = cleaned.get("password2")
+            # This case isn't handled by the base class's clean_password2()
+            if pw1 and not pw2 or not pw1 and pw2:
+                raise ValidationError(
+                    self.error_messages["password_mismatch"], code="password_mismatch"
+                )
+            return cleaned
+
+        def clean_password2(self):
+            pw2 = self.cleaned_data.get("password2")
+            # The original implementations assume the field to be required and hence
+            # would fail validation on an empty value
+            if pw2:
+                return super().clean_password2()
+            return pw2
+
+        def save(self, commit=True):
+            user = super().save(commit=False)
+            if not self.cleaned_data.get("password2"):
+                user.set_unusable_password()
+            if commit:
+                user.save()
+            return user
+
+    class AdminPasswordChangeForm(UnusablePasswordMixin, _AdminPasswordChangeForm):
+        password1 = forms.CharField(
+            required=False,
+            strip=False,
+            help_text=_AdminPasswordChangeForm.base_fields["password1"].help_text,
+            label=_AdminPasswordChangeForm.base_fields["password1"].label,
+            widget=_AdminPasswordChangeForm.base_fields["password1"].widget,
+        )
+        password2 = forms.CharField(
+            required=False,
+            strip=False,
+            help_text=_AdminPasswordChangeForm.base_fields["password2"].help_text,
+            label=_AdminPasswordChangeForm.base_fields["password2"].label,
+            widget=_AdminPasswordChangeForm.base_fields["password2"].widget,
+        )
+
+    class UserCreationForm(UnusablePasswordMixin, _UserCreationForm):
+        # Make fields optional
+        password1 = forms.CharField(
+            required=False,
+            strip=False,
+            help_text=_UserCreationForm.base_fields["password1"].help_text,
+            label=_UserCreationForm.base_fields["password1"].label,
+            widget=_UserCreationForm.base_fields["password1"].widget,
+        )
+        password2 = forms.CharField(
+            required=False,
+            strip=False,
+            help_text=_UserCreationForm.base_fields["password2"].help_text,
+            label=_UserCreationForm.base_fields["password2"].label,
+            widget=_UserCreationForm.base_fields["password2"].widget,
+        )
+
     fieldsets = (
         (_("Login info"), {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email")}),
@@ -605,9 +676,20 @@ class UserAdmin(rules_admin.ObjectPermissionsModelAdminMixin, _UserAdmin):
         ),
     )
     add_fieldsets = (
-        (_("Login info"), {"fields": ("username", "password1", "password2")}),
+        (
+            _("Login info"),
+            {
+                "description": _(
+                    "Leave both password fields empty if the user will authenticate "
+                    "via an external service like LDAP."
+                ),
+                "fields": ("username", "password1", "password2"),
+            },
+        ),
         (_("Personal info"), {"fields": ("email", "first_name", "last_name")}),
     )
+    add_form = UserCreationForm
+    change_password_form = AdminPasswordChangeForm
     filter_horizontal = ("study_courses",)
     list_display = ("username", "first_name", "last_name", "email", "is_staff")
     list_filter = ("is_staff", "is_superuser", "is_active")
