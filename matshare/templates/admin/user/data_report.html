@@ -16,7 +16,7 @@
 <p>
 	{% trans "Username" %}: {{ user.username }}<br/>
 	{% trans "Account created" %}: {{ user.date_joined }}<br/>
-	{% trans "Last login" %}: {{ user.last_login }}<br/>
+	{% trans "Last login" %}: {{ user.last_login|or_dash }}<br/>
 </p>
 
 <hr/>
