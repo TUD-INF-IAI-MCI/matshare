@@ -80,7 +80,7 @@ class SingleCourseViewMixin(SingleObjectMixin):
         if self.access_level < self.min_access_level:
             if request.user.is_authenticated:
                 raise PermissionDenied
-            return redirect_to_login(request.build_absolute_uri())
+            return redirect_to_login(request.get_full_path())
         if self.object.is_static and self.no_static_courses:
             raise Http404
         return super().dispatch(request, *args, **kwargs)
