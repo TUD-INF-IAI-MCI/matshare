@@ -215,6 +215,20 @@ USE_L10N = True
 USE_TZ = True
 
 
+# Absolute URL under which MatShare is accessible to the public
+MS_URL = env.str("MS_URL", "https://my-domain").rstrip("/")
+MS_URL_SPL = urllib.parse.urlsplit(MS_URL)
+
+# URL to the root of the webserver running MatShare
+MS_ROOT_URL = urllib.parse.urlunsplit(
+    (MS_URL_SPL.scheme, MS_URL_SPL.netloc, "", MS_URL_SPL.query, MS_URL_SPL.fragment)
+)
+
+# uWSGI always mounts Matshare in /, but we want the URL reverser to return correct
+# values
+FORCE_SCRIPT_NAME = MS_URL_SPL.path
+
+
 # User uploaded files
 MEDIA_ROOT = os.path.abspath(env.str("MS_MEDIA_ROOT", root("media")))
 
@@ -223,21 +237,8 @@ MEDIA_ROOT = os.path.abspath(env.str("MS_MEDIA_ROOT", root("media")))
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_ROOT = os.path.abspath(env.str("MS_STATIC_ROOT", root("static")))
-STATIC_URL = env.str("MS_STATIC_URL", "/static/")
-
-
-# Absolute URL under which MatShare is accessible to the public
-MS_URL = env.str("MS_URL", "https://my-domain").rstrip("/")
-
-# URL to the root of the webserver running MatShare
-spl = urllib.parse.urlsplit(MS_URL)
-MS_ROOT_URL = urllib.parse.urlunsplit(
-    (spl.scheme, spl.netloc, "", spl.query, spl.fragment)
-)
-
-# uWSGI always mounts Matshare in /, but we want the URL reverser to return correct
-# values
-FORCE_SCRIPT_NAME = spl.path
+# Hosted by uWSGI in <MS_URL>/static/ by default
+STATIC_URL = env.str("MS_STATIC_URL", MS_URL_SPL.path + "/static").rstrip("/") + "/"
 
 
 # E-mail settings

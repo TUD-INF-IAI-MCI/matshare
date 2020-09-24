@@ -29,7 +29,10 @@ services:
       #MS_TIME_ZONE: America/Chicago
       # URL under which MatShare is accessible to the public. This will, for instance,
       # be used in emails.
-      #MS_URL: http://localhost:8000
+      #MS_URL: "http://localhost:8000"
+      # Static files are hosted efficiently at <MS_URL>/static. If,
+      # however, you want to host them elsewhere, specify the URL here
+      #MS_STATIC_URL: "<MS_URL>/static"
       # Settings regarding e-mail sending
       #MS_DEFAULT_FROM_EMAIL: "MatShare <my-email@my-domain>"
       # Set in Reply-To header of sent emails
