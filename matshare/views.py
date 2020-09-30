@@ -188,6 +188,7 @@ class EasyAccessActivationView(MatShareViewMixin, TemplateView):
             pks[str(easy_access.course.pk)] = easy_access.pk
             request.session.modified = True
             response = redirect("easy_access_activation", token=easy_access.token)
+            # User has accepted privacy policy by proceeding; store consent in cookie
             set_consent(request, response, "privacy", True)
             return response
         # Display form with errors
@@ -225,12 +226,13 @@ class LoginView(MatShareViewMixin, _LoginView):
     is_login = True
 
     def form_valid(self, form):
-        """Store current language in user's account upon first login."""
+        # Store current language in user's account upon first login
         user = form.get_user()
         if not user.language:
             user.language = translation.get_language()
             user.save()
         response = super().form_valid(form)
+        # User has accepted privacy policy by logging in; store consent in cookie
         set_consent(self.request, response, "privacy", True)
         return response
 
