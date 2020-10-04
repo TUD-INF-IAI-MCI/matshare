@@ -55,10 +55,19 @@
 						<dd class="col-6">{{ easy_access.expiration_date }}</dd>
 					</dl>
 					<p class="card-text">
-					{% blocktrans trimmed %}Maybe you want to bookmark this page; you'll need it to regain access at your next visit.{% endblocktrans %}
+						{% blocktrans trimmed %}
+							Maybe you want to bookmark this page; you'll need it to regain access at your next visit.
+						{% endblocktrans %}
 					</p>
 				</div>
 				<div class="card-footer text-right">
+					<form class="d-inline m-0" method="POST">{% csrf_token %}
+						<input type="hidden" name="deactivate" value="1"/>
+						<button class="btn btn-secondary" type="submit">
+							<i class="fas fa-sign-out-alt mr-1" aria-hidden="true"></i>
+							{% trans "Sign out" %}
+						</button>
+					</form>
 					<a class="btn btn-primary" href="{{ easy_access.course.get_absolute_url }}">
 						<i class="fas fa-step-forward mr-1" aria-hidden="true"></i>
 						{% trans "Proceed" %}

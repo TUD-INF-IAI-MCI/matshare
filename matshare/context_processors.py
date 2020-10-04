@@ -7,6 +7,16 @@ from django.conf import settings
 from . import __version__
 
 
+def easy_access_context_processor(request):
+    """
+    Add EasyAccess objects for displaying in top menu.
+    """
+    from .models import EasyAccess
+
+    ea_pks = tuple(request.session.get("easy_access", {}).values())
+    return {"easy_accesses": EasyAccess.objects.filter(pk__in=ea_pks) if ea_pks else ()}
+
+
 def matshare_context_processor(request=None):
     """Add some values commonly used among views.
 

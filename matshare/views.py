@@ -145,7 +145,7 @@ class EasyAccessActivationView(MatShareViewMixin, TemplateView):
 
         def clean(self):
             super().clean()
-            if (
+            if "email" in self.cleaned_data and (
                 self.easy_access is None
                 or self.easy_access.email.lower() != self.cleaned_data["email"].lower()
             ):
@@ -181,12 +181,21 @@ class EasyAccessActivationView(MatShareViewMixin, TemplateView):
         return super().get(request, easy_access=easy_access)
 
     def post(self, request, easy_access):
+        ea = request.session.get("easy_access", {})
+        if request.POST.get("deactivate"):
+            try:
+                del ea[str(easy_access.course.pk)]
+            except KeyError:
+                pass
+            else:
+                request.session.modified = True
+                messages.success(request, _("You have signed out."))
+            return redirect(request.META.get("HTTP_REFERER") or reverse("home"))
         form = self.EmailConfirmationForm(request.POST, easy_access=easy_access)
         if form.is_valid():
             # Activate EasyAccess in this session and redirect to info page
-            pks = request.session.setdefault("easy_access", {})
-            pks[str(easy_access.course.pk)] = easy_access.pk
-            request.session.modified = True
+            ea[str(easy_access.course.pk)] = easy_access.pk
+            request.session["easy_access"] = ea
             response = redirect("easy_access_activation", token=easy_access.token)
             # User has accepted privacy policy by proceeding; store consent in cookie
             set_consent(request, response, "privacy", True)

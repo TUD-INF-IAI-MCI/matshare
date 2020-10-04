@@ -145,6 +145,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "matshare.context_processors.matshare_context_processor",
+                "matshare.context_processors.easy_access_context_processor",
             ],
         },
     },

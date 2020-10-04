@@ -53,6 +53,39 @@
 	</div>
 
 	<ul class="navbar-nav">
+		{% if request.session.easy_access %}
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarEasyAccessDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<i class="fas fa-user mr-1" aria-hidden="true"></i>
+					EasyAccess
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarEasyAccessDropdown">
+					{% for easy_access in easy_accesses %}
+						<div class="dropdown-item">
+							<div class="d-flex justify-content-between flex-wrap">
+								<a class="btn btn-sm btn-info mr-2" href="{{ easy_access.course.get_absolute_url }}">
+									{{ easy_access.course }}
+								</a>
+								<div>
+									<form class="d-inline m-0" action="{{ easy_access.absolute_activation_url }}" method="POST">{% csrf_token %}
+										<input type="hidden" name="deactivate" value="1"/>
+										<button class="btn btn-secondary" type="submit" title="{% trans "Sign out" %}">
+											<i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+										</button>
+									</form>
+									<a class="btn btn-secondary ml-1" href="{{ easy_access.absolute_activation_url }}" title="{% trans "Info" %}">
+										<i class="fas fa-ellipsis-h" aria-hidden="true"></i>
+									</a>
+								</div>
+							</div>
+						</div>
+						{% if not forloop.last %}
+							<div class="dropdown-divider"></div>
+						{% endif %}
+					{% endfor %}
+				</div>
+			</li>
+		{% endif %}
 		{% if user.is_authenticated %}
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
