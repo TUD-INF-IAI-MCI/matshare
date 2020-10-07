@@ -51,9 +51,7 @@ RUN \
     poetry install --no-dev --no-root && \
     rm -rf ~/.cache/* /tmp/*
 
-# Copy config files and application data
-COPY git_hooks git_hooks
-copy git_initial git_initial
+# Copy config files and scripts
 COPY manage.py ./
 COPY scripts/initialize_matshare.py scripts/run_uwsgi.sh ./
 COPY uwsgi_configs uwsgi_configs

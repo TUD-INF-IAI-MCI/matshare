@@ -104,8 +104,7 @@ services:
     restart: always
     volumes:
     - /etc/localtime:/etc/localtime:ro
-    - ./media:/opt/matshare/media
-    - ./git_repos:/opt/matshare/git_repos
+    - ./data:/opt/matshare/data
 
   db:
     environment:

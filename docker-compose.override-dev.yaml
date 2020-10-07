@@ -30,8 +30,6 @@ services:
     # unavailable, so you need to run "./manage.py compilemessages" outside the
     # container to have the *.mo files available in the mounted directory.
     - ./matshare:/opt/matshare/matshare:ro
-    - ./git_hooks:/opt/matshare/git_hooks:ro
-    - ./git_initial:/opt/matshare/git_initial:ro
     - ./uwsgi_configs:/opt/matshare/uwsgi_configs:ro
 
   nginx:

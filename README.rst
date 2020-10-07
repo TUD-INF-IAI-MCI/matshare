@@ -40,9 +40,15 @@ variables, all of which are listed and documented in the bundled
 way you don't mess with the default values and make future upgrades run smoothly. A
 sample for development purposes can be found in ``docker-compose.override-dev.yaml``.
 
+Before starting MatShare for the first time, you need to provide a data directory
+for storing runtime data such as git repositories and uploaded files. The directory
+``data.sample`` contains the basic files to start with. Copy it over to ``data``,
+which will be ignored by git. The ``data`` directory will then be mounted into the
+Docker container running MatShare.
+
 Another point for you to customize is corporate identity in the HTML templates. In
-the directory ``matshare/ci_templates/matshare_ci``, you find a README file explaining
-how to do it.
+the directory ``data.sample/custom_templates/matshare_ci``, you find a README file
+explaining how to do it.
 
 When you're all set, bring the whole stack up by running::
 
@@ -65,17 +71,22 @@ there.
 
 The general upgrade path is then:
 
-1. Backup the database contents and all directories in case anything goes wrong.
+1. Backup the database contents and data directory in case anything goes wrong.
 
-2. Update the code base.
+2. Update the code base and check ``CHANGELOG.md`` for eventual additional steps
+   to take.
 
-3. Rebuild images and recreate the containers::
+3. Copy the contents of ``data.sample`` to your existing data directory in case git
+   hooks or similar have changed. If you modified files in ``git_initial``, make
+   sure to not overwrite your own changes.
+
+4. Rebuild images and recreate the containers::
 
        docker-compose pull db
        docker-compose build --pull
        docker-compose up -d
 
-4. Verify everything looks good::
+5. Verify everything looks good::
 
        docker-compose logs uwsgi
 

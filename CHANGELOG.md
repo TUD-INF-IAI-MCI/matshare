@@ -1,6 +1,41 @@
 # Changelog
 
 
+## 0.2.0
+
+### Added
+* Added the `MS_DATA_DIR` setting (see below).
+
+### Changed
+* The various path settings are now all consolidated into one setting, `MS_DATA_DIR`.
+  This requires the following changes to existing installations after upgrade:
+
+  1. Pick a directory for all runtime data.
+  2. If you use the docker image, mount this directory to
+     `/opt/matshare/data`. Otherwise, configure the correct location as `MS_DATA_DIR`.
+  3. Move the data from previous directories to the new data directory:
+     ```
+	 export MS_DATA_DIR=<absolute-path-to-data-directory>
+     mv git_hooks git_initial git_repos media/* $MS_DATA_DIR
+     ```
+  4. Reconfigure all git repositories to use the new hooks directory:
+     ```
+     for repo in $(find $MS_DATA_DIR/git_repos -mindepth 4 -maxdepth 4 -type d); do
+       git -C $repo config core.hooksPath $MS_DATA_DIR/git_hooks
+     done
+     ```
+  5. Make sure the user running matshare (root in case of the Docker container)
+     can write to the data directory.
+
+* The corporate identity templates are now located at
+  `<data-dir>/custom_templates`. Please move yours over from the previous location
+  `matshare/ci_templates` and delete the obsolete `ci_templates` directory.
+
+## Removed
+* Removed the following settings as part of the consolidation described above:
+  `MS_GIT_HOOKS_DIR`, `MS_GIT_INITIAL_DIR`, `MS_GIT_ROOT`, `MS_MEDIA_ROOT`
+
+
 ## 0.1.3 - 2020-11-21
 ### Fixed
 * Fixed a bug which always caused the default notification frequency to be displayed

@@ -139,16 +139,11 @@ dmypy.json
 cython_debug/
 
 # static files generated from Django application using `collectstatic`
-/media
 /static
 
 # Usually a symlink to docker-compose.override-dev.yaml
 /docker-compose.override.yaml
 
 # Default docker-compose mountpoints
-/git_repos
-/media
+/data
 /pgdata
-
-# Custom corporate identity templates
-/matshare/ci_templates/matshare_ci/*.html

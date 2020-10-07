@@ -22,6 +22,9 @@ env = environ.Env()
 # Project root is two directory levels up
 root = environ.Path(__file__) - 2
 
+# All runtime data is stored here, incl. git repos, uploaded files, builds etc.
+MS_DATA_DIR = os.path.abspath(env.str("MS_DATA_DIR", root("data")))
+
 
 DEBUG = env.bool("MS_DEBUG", False)
 
@@ -124,9 +127,9 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-            # Try loading custom corporate identity templates before falling back
-            # to the defaults in the templates directory
-            root("matshare", "ci_templates"),
+            # Try loading custom templates before falling back to the defaults in
+            # the templates directory
+            os.path.join(MS_DATA_DIR, "custom_templates"),
             # The templates directory is added here explicitly because APP_DIRS won't
             # allow overriding templates of apps that come earlier in INSTALLED_APPS
             root("matshare", "templates"),
@@ -233,7 +236,7 @@ FORCE_SCRIPT_NAME = MS_URL_SPL.path
 
 
 # User uploaded files
-MEDIA_ROOT = os.path.abspath(env.str("MS_MEDIA_ROOT", root("media")))
+MEDIA_ROOT = MS_DATA_DIR
 
 
 # Static files (CSS, JavaScript, Images)
@@ -315,16 +318,16 @@ MS_GIT_ADMIN_EMAIL = env.str("MS_GIT_ADMIN_EMAIL", MS_CONTACT_EMAIL)
 MS_GIT_MAIN_REF = env.str("MS_GIT_MAIN_REF", "refs/heads/master")
 
 # Directory the git repositories of courses are stored in
-MS_GIT_ROOT = os.path.abspath(env.str("MS_GIT_ROOT", root("git_repos")))
+MS_GIT_ROOT = os.path.join(MS_DATA_DIR, "git_repos")
 
 # Mapping of keys and values to add to git config when creating a repository
 MS_GIT_EXTRA_CONFIG = env.dict("MS_GIT_EXTRA_CONFIG", default={})
 
 # This will be set as core.hooksPath in git config when creating a repository
-MS_GIT_HOOKS_DIR = os.path.abspath(env.str("MS_GIT_HOOKS_DIR", "git_hooks"))
+MS_GIT_HOOKS_DIR = os.path.join(MS_DATA_DIR, "git_hooks")
 
 # Contents of this directory are committed to newly created repositories
-MS_GIT_INITIAL_DIR = os.path.abspath(env.str("MS_GIT_INITIAL_DIR", root("git_initial")))
+MS_GIT_INITIAL_DIR = os.path.join(MS_DATA_DIR, "git_initial")
 
 # Subdirectories inside a course's git repository that hold edited material and sources
 MS_GIT_EDIT_SUBDIR = env.str("MS_GIT_EDIT_SUBDIR", "edit")
