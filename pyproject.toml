@@ -8,7 +8,7 @@ target-version = ["py37"]
 
 [tool.poetry]
 name = "matshare"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Robert Schindler <robert.schindler@mailbox.tu-dresden.de>"]
 
