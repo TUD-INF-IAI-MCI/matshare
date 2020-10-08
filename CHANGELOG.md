@@ -1,7 +1,7 @@
 # Changelog
 
 
-## Unreleased
+## 0.1.1
 ### Fixed
 * The `MS_EMAIL_USE_SSL` and `MS_EMAIL_USE_TLS` settings had no effect.
 * The `MS_REPLY_TO_EMAIL` setting is actually named `MS_CONTACT_EMAIL`; fixed docs.
