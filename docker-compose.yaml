@@ -36,7 +36,7 @@ services:
       # Settings regarding e-mail sending
       #MS_DEFAULT_FROM_EMAIL: "MatShare <my-email@my-domain>"
       # Set in Reply-To header of sent emails
-      #MS_REPLY_TO_EMAIL: "MatShare <my-email@my-domain>"
+      #MS_CONTACT_EMAIL: "MatShare <my-email@my-domain>"
       #MS_EMAIL_HOST: localhost
       #MS_EMAIL_PORT: 25
       # Optionally, set credentialsfor SMTP authentication
