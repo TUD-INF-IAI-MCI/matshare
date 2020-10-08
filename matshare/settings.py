@@ -252,8 +252,8 @@ EMAIL_HOST = env.str("MS_EMAIL_HOST", "localhost")
 EMAIL_HOST_USER = env.str("MS_EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = env.str("MS_EMAIL_HOST_PASSWORD", "")
 EMAIL_PORT = env.int("MS_EMAIL_PORT", 25)
-EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", False)
-EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", False)
+EMAIL_USE_SSL = env.bool("MS_EMAIL_USE_SSL", False)
+EMAIL_USE_TLS = env.bool("MS_EMAIL_USE_TLS", False)
 EMAIL_USE_LOCALTIME = True
 
 
