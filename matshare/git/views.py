@@ -5,7 +5,8 @@ import os
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, reverse
+from django.shortcuts import get_object_or_404
+from django.urls import get_script_prefix, reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
@@ -49,7 +50,10 @@ class GitAuthView(View):
                     + request.META["SERVER_NAME"]
                     + ":"
                     + request.META["SERVER_PORT"]
-                    + reverse("git_push_notify", kwargs={"course_pk": course.pk}),
+                    + "/"
+                    + reverse("git_push_notify", kwargs={"course_pk": course.pk})[
+                        len(get_script_prefix()) :
+                    ].lstrip("/"),
                 }
             )
         )
