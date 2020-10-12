@@ -1,7 +1,14 @@
 # Changelog
 
 
+## 0.1.2
+
+### Removed
+* Removed German from the language choices since there are no translations yet.
+
+
 ## 0.1.1 - 2020-10-08
+
 ### Fixed
 * The `MS_EMAIL_USE_SSL` and `MS_EMAIL_USE_TLS` settings had no effect.
 * The `MS_REPLY_TO_EMAIL` setting is actually named `MS_CONTACT_EMAIL`; fixed docs.

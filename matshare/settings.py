@@ -200,7 +200,7 @@ LANGUAGE_COOKIE_NAME = "ms_lang"
 
 # We only offer the subset of all Django-provided languages MatShare was translated to
 LANGUAGES = [
-    (code, name) for code, name in AVAILABLE_DJANGO_LANGUAGES if code in ("de", "en")
+    (code, name) for code, name in AVAILABLE_DJANGO_LANGUAGES if code in ("en",)
 ]
 
 # Fallback language in case the browser-requested one is unavailable
