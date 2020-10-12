@@ -90,6 +90,8 @@ services:
       #MS_AUTH_LDAP_USER_ATTR_EMAIL: "mail"
       #MS_AUTH_LDAP_USER_ATTR_FIRST_NAME: "givenName"
       #MS_AUTH_LDAP_USER_ATTR_LAST_NAME: "sn"
+      # Whether staff members can create new local users in MatShare.
+      #MS_STAFF_CAN_CREATE_USERS: "1"
       # Whether the password reset functionality for native users should be enabled.
       # You'll probably want to disable it when using external authentication.
       #MS_PASSWORD_RESET: 1

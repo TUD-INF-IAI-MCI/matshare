@@ -1535,9 +1535,10 @@ class User(Model, AbstractUser, metaclass=RulesModelBase):
 
     class Meta:
         rules_permissions = {
-            "add": rules.is_staff,
-            "change": rules.is_superuser | rules.is_staff & _obj_is_regular_user,
-            "delete": rules.is_superuser | rules.is_staff & _obj_is_regular_user,
+            "add": rules.is_staff
+            & rules.predicate(lambda *_: settings.MS_STAFF_CAN_CREATE_USERS),
+            "change": rules.is_staff & _obj_is_regular_user,
+            "delete": rules.is_staff & _obj_is_regular_user,
             "view": rules.is_staff,
         }
 

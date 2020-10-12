@@ -118,6 +118,8 @@ if env.bool("MS_AUTH_LDAP", False):
         "last_name": env.str("MS_AUTH_LDAP_USER_ATTR_LAST_NAME"),
     }
 
+MS_STAFF_CAN_CREATE_USERS = env.bool("MS_STAFF_CAN_CREATE_USERS", True)
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",

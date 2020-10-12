@@ -2,6 +2,8 @@
 
 
 ## 0.1.2
+### Added
+* Added the `MS_STAFF_CAN_CREATE_USERS` setting, which is enabled by default.
 
 ### Removed
 * Removed German from the language choices since there are no translations yet.
