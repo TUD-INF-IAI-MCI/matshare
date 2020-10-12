@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 0.1.2
+## 0.1.2 - 2020-10-12
 ### Added
 * Added the `MS_STAFF_CAN_CREATE_USERS` setting, which is enabled by default.
 
