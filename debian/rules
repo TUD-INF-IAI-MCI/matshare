@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+%:
+	dh $@
+
+override_dh_clean:
+	rm -rf yarn.lock node_modules static matshare/locale matshare/**/__pycache__
+	dh_clean
+
+override_dh_auto_build:
+	./scripts/manage.py collectstatic
+	yarnpkg
+	./scripts/collect_assets
+	mkdir -p matshare/locale
+	MAKEMESSAGES_OPTS="--ignore debian --ignore node_modules " ./scripts/update_translations
+	./scripts/manage.py compilemessages --ignore debian
+
+override_dh_fixperms:
+	dh_fixperms
+	chmod 750 data.defaults/config

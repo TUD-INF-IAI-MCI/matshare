@@ -1,0 +1,11 @@
+data /opt/matshare
+matshare /opt/matshare
+static /opt/matshare
+uwsgi_configs/* /etc/uwsgi/apps-available
+
+scripts/config /opt/matshare/scripts
+scripts/create_admin_user /opt/matshare/scripts
+scripts/init_or_upgrade /opt/matshare/scripts
+scripts/manage.py /opt/matshare/scripts
+
+debian/compile_debian_config /opt/matshare/scripts

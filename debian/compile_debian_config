@@ -1,0 +1,8 @@
+#!/bin/sh -e
+# Write the configuration variables resulting from the current configuration to the
+# Debian-specific compiled config file.
+# This is called when running "dpkg-reconfigure matshare".
+
+FILE=data/config/debian_compiled
+
+./scripts/config > "$FILE"

@@ -1,0 +1,22 @@
+Source: matshare
+Section: net
+Priority: optional
+Maintainer: Manfred Benesch <manfred.benesch@tu-dresden.de>
+Build-Depends: debhelper (>= 11), python3-django (>> 2:3.0.0~), python3-asgiref (>= 3.2.7), python3-django-auth-ldap, python3-django-environ, python3-django-filters (>= 2.1), python3-stdnum, python3-django-rules,
+ python3-django-watson (>= 1.5.5~), python3-django-widget-tweaks (>= 1.4.8~), python3-django-rules (>= 2.2), python3-psycopg2, python3-django-flexquery (>= 4.2~),  python3-django-timezone-field, python3-pygit2,
+ python3-uwsgi-tasks, yarnpkg, libjs-jquery
+Standards-Version: 4.1.3
+Homepage: https://github.com/TUD-INF-IAI-MCI/matshare
+
+Package: matshare
+Architecture: all
+Depends: ${misc:Depends}, python3-django (>> 2:3.0.0~), python3-django-flexquery (>= 4.2~), python3-django-watson (>= 1.5.5~),
+ python3-django-widget-tweaks (>= 1.4.8~), python3-django-environ, python3-django-auth-ldap ( >= 2.2.0~), python3-django-timezone-field,
+ python3-django-filters (>= 2.1), python3-django-rules (>= 2.2), python3-stdnum, python3-psycopg2, python3-pygit2 (>= 1.0.0),
+ python3-argon2, python3-feedgen (>= 0.9~), python3-uwsgi-tasks (>= 0.7.3~),
+ uwsgi-plugin-python3 (>= 2.1), uwsgi (>= 2.1), python3-magsbs
+Description: Material distribution system
+ This is the material distribution system developed by the
+ Working Group Services Disability and Studies at
+ Dresden University of Technology to provide visually
+ impaired students with the material they need to attend courses.
