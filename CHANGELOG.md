@@ -3,6 +3,10 @@
 
 ## 0.2.0
 
+### Fixed
+* No longer show the "Add" and "Change" buttons for material builds when logged in
+  as superuser.
+
 ### Added
 * Added the `MS_DATA_DIR` setting (see below).
 

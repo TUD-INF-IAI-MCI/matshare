@@ -531,7 +531,6 @@ class MaterialBuildAdmin(rules_admin.ObjectPermissionsModelAdmin):
         "date_created",
         "date_done",
     )
-    readonly_fields = fields
     list_display = ("course", "format", "get_short_revision", "status", "date_created")
     list_filter = ("format", "status")
     ordering = ("-date_created",)
@@ -541,6 +540,14 @@ class MaterialBuildAdmin(rules_admin.ObjectPermissionsModelAdmin):
         return obj.revision[:7]
 
     get_short_revision.short_description = _("revision")
+
+    def has_add_permission(self, request):
+        """Material builds can't be created manually."""
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        """Material builds can't be changed, only deleted."""
+        return False
 
 
 @admin.register(StudyCourse, site=admin_site)
