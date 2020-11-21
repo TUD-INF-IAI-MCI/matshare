@@ -794,14 +794,13 @@ class SubscriptionView(CourseDetailViewBase):
                 sub = CourseStudentSubscription.objects.get(
                     course=self.object, user=self.request.user
                 )
+                ctx["form"] = self.SubscriptionForm(instance=sub)
             except CourseStudentSubscription.DoesNotExist:
-                pass
-            ctx["form"] = self.SubscriptionForm(
-                initial={
-                    "notification_frequency": self.request.user.default_material_notification_frequency
-                },
-                instance=sub,
-            )
+                ctx["form"] = self.SubscriptionForm(
+                    initial={
+                        "notification_frequency": self.request.user.default_material_notification_frequency
+                    }
+                )
         else:
             ctx["form"] = None
         ctx["subscription"] = sub

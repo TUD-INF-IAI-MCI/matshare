@@ -1,6 +1,12 @@
 # Changelog
 
 
+## 0.1.3
+### Fixed
+* Fixed a bug which always caused the default notification frequency to be displayed
+  instead of that configured per course.
+
+
 ## 0.1.2 - 2020-10-12
 ### Added
 * Added the `MS_STAFF_CAN_CREATE_USERS` setting, which is enabled by default.
