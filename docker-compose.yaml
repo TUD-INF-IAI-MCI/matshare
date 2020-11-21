@@ -112,7 +112,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     hostname: postgres
-    image: postgres:alpine
+    image: postgres:13.1-alpine
     restart: always
     volumes:
     - /etc/localtime:/etc/localtime:ro
