@@ -6,6 +6,9 @@
 * Fixed a bug which always caused the default notification frequency to be displayed
   instead of that configured per course.
 
+### Changed
+* Switch from deprecated node-sass to dart sass in order to avoid compiling libsass.
+
 
 ## 0.1.2 - 2020-10-12
 ### Added

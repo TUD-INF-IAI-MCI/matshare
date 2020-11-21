@@ -1,5 +1,5 @@
 # Collect assets using yarn
-FROM node:alpine AS yarn_static
+FROM node:15-alpine3.12 AS yarn_static
 
 WORKDIR /tmp
 COPY package.json .
