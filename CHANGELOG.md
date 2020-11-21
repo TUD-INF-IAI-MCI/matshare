@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 0.1.3
+## 0.1.3 - 2020-11-21
 ### Fixed
 * Fixed a bug which always caused the default notification frequency to be displayed
   instead of that configured per course.
