@@ -35,7 +35,7 @@ def build_material(sender, instance, created, **kwargs):
 def create_course_repository(sender, instance, created, **kwargs):
     """Initializes the git repository upon course creation.
 
-    The new repository is initialized with contents of ``MS_GIT_INITIAL_DIR``.
+    The new repository is initialized with contents of the git_initial directory.
     """
     # Do nothing for courses with static material
     if not created or instance.is_static:
@@ -60,16 +60,23 @@ def create_course_repository(sender, instance, created, **kwargs):
         ),
     )
     # Keep hooks at a central place instead of copying them to each repository
-    repo.config["core.hooksPath"] = settings.MS_GIT_HOOKS_DIR
+    repo.config["core.hooksPath"] = os.path.relpath(
+        settings.MS_GIT_HOOKS_DIR, repo_path
+    )
     # Apply custom git config
     for key, value in settings.MS_GIT_EXTRA_CONFIG.items():
         repo.config[key] = value
-    # Commit contents of MS_GIT_INITIAL_DIR as initial commit
-    browser = git_utils.ContentBrowser(repo)
-    browser.add_from_fs(settings.MS_GIT_INITIAL_DIR)
-    browser.commit(
-        git_utils.create_admin_signature(), "Initial commit", settings.MS_GIT_MAIN_REF
-    )
+    # Commit initial content
+    for _dir in settings.MS_GIT_INITIAL_DIRS:
+        if os.path.isdir(_dir):
+            browser = git_utils.ContentBrowser(repo)
+            browser.add_from_fs(_dir)
+            browser.commit(
+                git_utils.create_admin_signature(),
+                "Initial commit",
+                settings.MS_GIT_MAIN_REF,
+            )
+            break
 
 
 @receiver(post_delete, sender=Course)
@@ -77,7 +84,7 @@ def remove_course_directories(sender, instance, **kwargs):
     """Remove associated directories after a course was deleted."""
     if instance.is_static:
         dir_to_remove = instance.absolute_static_material_path
-        clean_up_to = settings.MEDIA_ROOT
+        clean_up_to = settings.MS_STATIC_COURSE_ROOT
     else:
         dir_to_remove = instance.absolute_repository_path
         clean_up_to = settings.MS_GIT_ROOT
@@ -94,6 +101,6 @@ def remove_material_build_directory(sender, instance, **kwargs):
         return
     LOGGER.info("Removing material build directory %r", instance.absolute_path)
     try:
-        utils.rmtree_and_clean(instance.absolute_path, settings.MEDIA_ROOT)
+        utils.rmtree_and_clean(instance.absolute_path, settings.MS_MATERIAL_BUILD_ROOT)
     except OSError as err:
         LOGGER.warning("Failed to remove %r: %r", instance.absolute_path, err)

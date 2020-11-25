@@ -10,31 +10,36 @@
 ### Added
 * Added the `MS_DATA_DIR` setting (see below).
 * The interface now better utilizes screen widths >= 1400px.
+* The recommended method for configuring MatShare is now file-based. See
+  `data.defaults/config/README.rst`. However, you can continue to set environment
+  variables via Docker if you like.
 
 ### Changed
 * The various path settings are now all consolidated into one setting, `MS_DATA_DIR`.
   This requires the following changes to existing installations after upgrade:
-
-  1. Pick a directory for all runtime data.
+  1. Pick a directory for all runtime data and copy the contents of `data.defaults`
+     to it.
   2. If you use the docker image, mount this directory to
-     `/opt/matshare/data`. Otherwise, configure the correct location as `MS_DATA_DIR`.
+     `/opt/matshare/data`. Otherwise, configure the correct location via `MS_DATA_DIR`
+     environment variable.
   3. Move the data from previous directories to the new data directory:
      ```
 	 export MS_DATA_DIR=<absolute-path-to-data-directory>
-     mv git_hooks git_initial git_repos media/* $MS_DATA_DIR
+     mv git_repos media/* $MS_DATA_DIR
+     rm -r git_hooks git_initial
      ```
   4. Reconfigure all git repositories to use the new hooks directory:
      ```
      for repo in $(find $MS_DATA_DIR/git_repos -mindepth 4 -maxdepth 4 -type d); do
-       git -C $repo config core.hooksPath $MS_DATA_DIR/git_hooks
+       git -C $repo config core.hooksPath ../../../../../git_hooks
      done
      ```
   5. Make sure the user running matshare (root in case of the Docker container)
      can write to the data directory.
-
 * The corporate identity templates are now located at
   `<data-dir>/custom_templates`. Please move yours over from the previous location
   `matshare/ci_templates` and delete the obsolete `ci_templates` directory.
+* The `MS_DATABASE_*` settings have been renamed to `MS_DB_*`.
 
 ## Removed
 * Removed the following settings as part of the consolidation described above:

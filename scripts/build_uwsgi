@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 # Build a custom uWSGI with all plugins required.
 # The patch for CGI chunked request handling, needed for git-http-backend, wasn't
 # released yet, hence uWSGI needs to be built from master.

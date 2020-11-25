@@ -19,14 +19,15 @@ from matshare.utils import parse_ldap_group_query_string
 
 
 env = environ.Env()
+
 # Project root is two directory levels up
 root = environ.Path(__file__) - 2
 
 # All runtime data is stored here, incl. git repos, uploaded files, builds etc.
-MS_DATA_DIR = os.path.abspath(env.str("MS_DATA_DIR", root("data")))
+MS_DATA_DIR = env.str("MS_DATA_DIR")
 
 
-DEBUG = env.bool("MS_DEBUG", False)
+DEBUG = env.bool("MS_DEBUG")
 
 SECRET_KEY = env.str("MS_SECRET_KEY", "")
 if not SECRET_KEY:
@@ -39,7 +40,7 @@ if not SECRET_KEY:
         )
 
 # These will receive error reports
-ADMINS = [(email, email) for email in env.tuple("MS_ERROR_EMAILS", default=())]
+ADMINS = [(email, email) for email in env.tuple("MS_ERROR_EMAILS")]
 
 # MatShare is guarded by nginx, which passes the original Host header
 # through. Additionally, uWSGI rewrites REMOTE_ADDR and wsgi.url_scheme according
@@ -90,7 +91,7 @@ LOGOUT_REDIRECT_URL = "home"
 
 SESSION_COOKIE_NAME = "ms_session"
 # Logout after some time of inactivity
-SESSION_COOKIE_AGE = env.int("MS_SESSION_EXPIRATION_SECS", 3600)
+SESSION_COOKIE_AGE = env.int("MS_SESSION_EXPIRATION_SECS")
 assert SESSION_COOKIE_AGE >= 0
 # Without this, the validity of sessions would never be reset and we hence couldn't
 # make them that short-lived and wouldn't get auto-logout behavior, even though
@@ -108,12 +109,12 @@ AUTHENTICATION_BACKENDS = [
     "matshare.auth.MatShareModelBackend",
 ]
 # Allow authenticating users via LDAP
-if env.bool("MS_AUTH_LDAP", False):
+if env.bool("MS_AUTH_LDAP"):
     AUTHENTICATION_BACKENDS.append("matshare.auth.MatShareLDAPBackend")
     AUTH_LDAP_SERVER_URI = env.str("MS_AUTH_LDAP_SERVER_URI")
     AUTH_LDAP_USER_DN_TEMPLATE = env.str("MS_AUTH_LDAP_USER_DN_TEMPLATE")
     AUTH_LDAP_REQUIRE_GROUP = parse_ldap_group_query_string(
-        env.str("MS_AUTH_LDAP_REQUIRE_GROUP", "")
+        env.str("MS_AUTH_LDAP_REQUIRE_GROUP")
     )
     AUTH_LDAP_USER_ATTR_MAP = {
         "email": env.str("MS_AUTH_LDAP_USER_ATTR_EMAIL"),
@@ -121,7 +122,7 @@ if env.bool("MS_AUTH_LDAP", False):
         "last_name": env.str("MS_AUTH_LDAP_USER_ATTR_LAST_NAME"),
     }
 
-MS_STAFF_CAN_CREATE_USERS = env.bool("MS_STAFF_CAN_CREATE_USERS", True)
+MS_STAFF_CAN_CREATE_USERS = env.bool("MS_STAFF_CAN_CREATE_USERS")
 
 TEMPLATES = [
     {
@@ -164,15 +165,15 @@ WSGI_APPLICATION = "matshare.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": env.str("MS_DATABASE_ENGINE", "django.db.backends.postgresql"),
-        "HOST": env.str("MS_DATABASE_HOST", ""),
-        "PORT": env.str("MS_DATABASE_PORT", ""),
-        "NAME": env.str("MS_DATABASE_NAME", ""),
-        "USER": env.str("MS_DATABASE_USER", ""),
-        "PASSWORD": env.str("MS_DATABASE_PASSWORD", ""),
+        "ENGINE": env.str("MS_DB_ENGINE", "django.db.backends.postgresql"),
+        "HOST": env.str("MS_DB_HOST"),
+        "PORT": env.str("MS_DB_PORT"),
+        "NAME": env.str("MS_DB_NAME"),
+        "USER": env.str("MS_DB_USER"),
+        "PASSWORD": env.str("MS_DB_PASSWORD"),
         "ATOMIC_REQUESTS": True,
-        "CONN_MAX_AGE": env.int("MS_DATABASE_CONN_MAX_AGE", 0),
-        "OPTIONS": env.json("MS_DATABASE_OPTIONS", {}),
+        "CONN_MAX_AGE": 0,
+        "OPTIONS": {},
     },
 }
 
@@ -209,12 +210,12 @@ LANGUAGES = [
 ]
 
 # Fallback language in case the browser-requested one is unavailable
-LANGUAGE_CODE = env.str("MS_LANGUAGE_CODE", "en")
+LANGUAGE_CODE = env.str("MS_LANGUAGE_CODE")
 _codes = [lang[0] for lang in LANGUAGES]
 if LANGUAGE_CODE not in _codes:
     raise ImproperlyConfigured(f"MS_LANGUAGE_CODE must be one of: {_codes}")
 
-TIME_ZONE = env.str("MS_TIME_ZONE", "UTC")
+TIME_ZONE = env.str("MS_TIME_ZONE")
 
 USE_I18N = True
 USE_L10N = True
@@ -222,7 +223,7 @@ USE_TZ = True
 
 
 # Absolute URL under which MatShare is accessible to the public
-MS_URL = env.str("MS_URL", "https://my-domain").rstrip("/")
+MS_URL = env.str("MS_URL").rstrip("/")
 MS_URL_SPL = urllib.parse.urlsplit(MS_URL)
 
 # URL to the root of the webserver running MatShare
@@ -236,29 +237,48 @@ FORCE_SCRIPT_NAME = MS_URL_SPL.path
 
 
 # User uploaded files
+# This is a feature of django, but MatShare currently doesn't need it
 MEDIA_ROOT = MS_DATA_DIR
+
+
+# Paths for various components of MatShare
+
+# This will be set as core.hooksPath in git config when creating a repository
+MS_GIT_HOOKS_DIR = os.path.join(MS_DATA_DIR, "git_hooks")
+
+# Contents of the first existing directory are committed to new repositories
+MS_GIT_INITIAL_DIRS = (
+    os.path.join(MS_DATA_DIR, "git_initial"),
+    os.path.join(MS_DATA_DIR, "git_initial.defaults"),
+)
+
+# Compiled material
+MS_MATERIAL_BUILD_ROOT = os.path.join(MS_DATA_DIR, "material_builds")
+
+# Uploaded files for courses with static material
+MS_STATIC_COURSES_ROOT = os.path.join(MS_DATA_DIR, "static_courses")
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_ROOT = os.path.abspath(env.str("MS_STATIC_ROOT", root("static")))
+STATIC_ROOT = root("static")
 # Hosted by uWSGI in <MS_URL>/static/ by default
 STATIC_URL = env.str("MS_STATIC_URL", MS_URL_SPL.path + "/static").rstrip("/") + "/"
 
 
 # E-mail settings
 
-DEFAULT_FROM_EMAIL = env.str("MS_DEFAULT_FROM_EMAIL", "MatShare <my-email@my-domain>")
+DEFAULT_FROM_EMAIL = env.str("MS_DEFAULT_FROM_EMAIL")
 # Use the same address as sender for error reports
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
-MS_CONTACT_EMAIL = env.str("MS_CONTACT_EMAIL", "my-email@my-domain")
-EMAIL_HOST = env.str("MS_EMAIL_HOST", "localhost")
-EMAIL_HOST_USER = env.str("MS_EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = env.str("MS_EMAIL_HOST_PASSWORD", "")
-EMAIL_PORT = env.int("MS_EMAIL_PORT", 25)
-EMAIL_USE_SSL = env.bool("MS_EMAIL_USE_SSL", False)
-EMAIL_USE_TLS = env.bool("MS_EMAIL_USE_TLS", False)
+MS_CONTACT_EMAIL = env.str("MS_CONTACT_EMAIL", DEFAULT_FROM_EMAIL)
+EMAIL_HOST = env.str("MS_EMAIL_HOST")
+EMAIL_HOST_USER = env.str("MS_EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env.str("MS_EMAIL_HOST_PASSWORD")
+EMAIL_PORT = env.int("MS_EMAIL_PORT")
+EMAIL_USE_SSL = env.bool("MS_EMAIL_USE_SSL")
+EMAIL_USE_TLS = env.bool("MS_EMAIL_USE_TLS")
 EMAIL_USE_LOCALTIME = True
 
 
@@ -282,7 +302,7 @@ LOGGING = {
     "loggers": {},
 }
 if DEBUG:
-    for logger_name in env.tuple("MS_DEBUG_LOGGERS", default=()):
+    for logger_name in env.tuple("MS_DEBUG_LOGGERS"):
         LOGGING["loggers"][logger_name] = {
             "handlers": ["console"],
             "level": "DEBUG",
@@ -291,13 +311,13 @@ if DEBUG:
 
 
 # Password resetting
-MS_PASSWORD_RESET = env.bool("MS_PASSWORD_RESET", True)
+MS_PASSWORD_RESET = env.bool("MS_PASSWORD_RESET")
 # How long should password reset links be valid
-MS_PASSWORD_RESET_EXPIRATION_HOURS = env.int("MS_PASSWORD_RESET_EXPIRATION_HOURS", 2)
+MS_PASSWORD_RESET_EXPIRATION_HOURS = env.int("MS_PASSWORD_RESET_EXPIRATION_HOURS")
 assert MS_PASSWORD_RESET_EXPIRATION_HOURS > 0
 
 
-# Varios MatShare-specific settings
+# Various MatShare-specific settings
 
 # Increment version whenever to prompt users for a consent again
 CONSENTS = {
@@ -308,30 +328,24 @@ CONSENTS = {
 }
 
 # Default values for newly created courses
-MS_COURSE_CONTRIBUTOR = env.str("MS_COURSE_CONTRIBUTOR", "")
-MS_COURSE_PUBLISHER = env.str("MS_COURSE_PUBLISHER", "")
+MS_COURSE_CONTRIBUTOR = env.str("MS_COURSE_CONTRIBUTOR")
+MS_COURSE_PUBLISHER = env.str("MS_COURSE_PUBLISHER")
 
-# Used for signatures of administrative commits, default is value of MS_CONTACT_EMAIL
-MS_GIT_ADMIN_EMAIL = env.str("MS_GIT_ADMIN_EMAIL", MS_CONTACT_EMAIL)
+# Used for signatures of administrative commits
+MS_GIT_ADMIN_EMAIL = env.str("MS_GIT_ADMIN_EMAIL")
 
-# The branch (or tag) material and source tracking happens on
-MS_GIT_MAIN_REF = env.str("MS_GIT_MAIN_REF", "refs/heads/master")
+# The branch material and source tracking happens on
+MS_GIT_MAIN_REF = env.str("MS_GIT_MAIN_REF")
 
 # Directory the git repositories of courses are stored in
 MS_GIT_ROOT = os.path.join(MS_DATA_DIR, "git_repos")
 
 # Mapping of keys and values to add to git config when creating a repository
-MS_GIT_EXTRA_CONFIG = env.dict("MS_GIT_EXTRA_CONFIG", default={})
-
-# This will be set as core.hooksPath in git config when creating a repository
-MS_GIT_HOOKS_DIR = os.path.join(MS_DATA_DIR, "git_hooks")
-
-# Contents of this directory are committed to newly created repositories
-MS_GIT_INITIAL_DIR = os.path.join(MS_DATA_DIR, "git_initial")
+MS_GIT_EXTRA_CONFIG = env.dict("MS_GIT_EXTRA_CONFIG")
 
 # Subdirectories inside a course's git repository that hold edited material and sources
-MS_GIT_EDIT_SUBDIR = env.str("MS_GIT_EDIT_SUBDIR", "edit")
-MS_GIT_SRC_SUBDIR = env.str("MS_GIT_SRC_SUBDIR", "src")
+MS_GIT_EDIT_SUBDIR = env.str("MS_GIT_EDIT_SUBDIR")
+MS_GIT_SRC_SUBDIR = env.str("MS_GIT_SRC_SUBDIR")
 
 # Matuc configuration file inside the edit subdirectory
 MS_MATUC_CONFIG_FILE = ".lecture_meta_data.dcxml"

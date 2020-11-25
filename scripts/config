@@ -1,0 +1,77 @@
+#!/bin/bash -e
+# Execute a command with MatShare configuration variables in place.
+#
+# This script will load the configuration files from a data directory, which can be
+# specified via the MS_DATA_DIR environment variable. The default is "./data".
+#
+# Then, the passed command is executed with all arguments, as known from e.g. sudo
+# and time. If called without passing a command, the config variables are written
+# to stdout, each line of the format VARIABLE=VALUE.
+#
+# When -d is given as first argument and the data directory doesn't exist, it is
+# tried to load a dummy configuration for development tasks such as offline management
+# commands (like makemigrations or compilemessages). No MatShare-specific environment
+# variables are then required.
+
+DEFAULT_DATA_DIR=data
+DEFAULT_DATA_DEFAULTS_DIR=data.defaults
+
+load_config() {
+	local dummy_ok="$1"
+
+	MS_DATA_DIR=${MS_DATA_DIR:-"$DEFAULT_DATA_DIR"}
+	if [ "$dummy_ok" == "1" ] && [ ! -d "$MS_DATA_DIR" ]; then
+		MS_DATA_DIR="$DEFAULT_DATA_DEFAULTS_DIR"
+		set_dummy_vars
+	fi
+	if [ ! -d "$MS_DATA_DIR" ]; then
+		echo "Data directory $MS_DATA_DIR not found; create it or set MS_DATA_DIR correctly" >&2
+		return 1
+	fi
+	if [ ! -d "$MS_DATA_DIR/config" ]; then
+		echo "No config directory found in $MS_DATA_DIR" >&2
+		return 1
+	fi
+
+	export MS_DATA_DIR=$(realpath "$MS_DATA_DIR")
+
+	# Automatically export all declared variables
+	set -a
+	for cfg_file in $(find "$MS_DATA_DIR/config" -name \*.conf -type f); do
+		. "$cfg_file"
+	done
+	set +a
+}
+
+set_dummy_vars() {
+	set -a
+	MS_DATA_DIR=${MS_DATA_DIR:-"data.defaults"}
+	MS_DEBUG=1
+	MS_DB_ENGINE=django.db.backends.sqlite3
+	MS_DB_NAME=:memory:
+	MS_DB_HOST=
+	MS_DB_PORT=
+	MS_DB_USER=
+	MS_DB_PASSWORD=
+	set +a
+}
+
+dummy_ok=0
+if [ "$1" == "-d" ]; then
+	shift
+	dummy_ok=1
+fi
+
+if [ -z "${_MS_CONFIGURED+x}" ]; then
+	load_config $dummy_ok
+	if [ $? -ne 0 ]; then
+		exit 1
+	fi
+	export _MS_CONFIGURED=
+fi
+
+if [ $# -eq 0 ]; then
+	env | grep '^_\?MS_'
+else
+	exec $@
+fi

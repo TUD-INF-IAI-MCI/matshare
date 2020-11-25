@@ -44,10 +44,7 @@ def spooled_build_material(build_pk):
         try:
             builder = getattr(material_building, "build_" + build.format.name)
             # Not create the final directory, so that shutil.copytree() can be used
-            try:
-                os.makedirs(os.path.dirname(build.absolute_path))
-            except FileExistsError:
-                pass
+            os.makedirs(os.path.dirname(build.absolute_path), exist_ok=True)
             # Pull the edited material into a temporary directory as scratchpad
             repo = pygit2.Repository(build.course.absolute_repository_path)
             browser = git_utils.ContentBrowser(repo, settings.MS_GIT_MAIN_REF)
@@ -64,10 +61,7 @@ def spooled_build_material(build_pk):
                 with transaction.atomic():
                     builder(build)
             # Ensure the build results directory exists
-            try:
-                os.makedirs(build.absolute_path)
-            except FileExistsError:
-                pass
+            os.makedirs(build.absolute_path, exist_ok=True)
             # Fix permissions that were preserved from temporary directory
             os.chmod(build.absolute_path, 0o755)
         except Exception as err:

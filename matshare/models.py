@@ -578,8 +578,7 @@ class Course(create_slug_mixin(max_length=150, unique=False), Model):
         """Absolute path of the directory this course's static material resides in."""
         self._ensure_is_static()
         return os.path.join(
-            settings.MEDIA_ROOT,
-            "static_courses",
+            settings.MS_STATIC_COURSE_ROOT,
             self.study_course.slug,
             self.NO_TERM_SLUG if self.term is None else self.term.slug,
             self.type.slug,
@@ -1385,8 +1384,7 @@ class MaterialBuild(Model):
     def absolute_path(self):
         """Absolute path of the build results directory."""
         return os.path.join(
-            settings.MEDIA_ROOT,
-            "material_builds",
+            settings.MS_MATERIAL_BUILD_ROOT,
             self.course.study_course.slug,
             self.course.NO_TERM_SLUG
             if self.course.term is None

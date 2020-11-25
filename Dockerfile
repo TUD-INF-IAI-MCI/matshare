@@ -3,10 +3,10 @@ FROM node:15-alpine3.12 AS yarn_static
 
 WORKDIR /tmp
 COPY package.json .
-RUN yarn
-COPY scripts/collect_assets.sh .
+RUN yarnpkg
+COPY scripts/collect_assets .
 COPY scss scss
-RUN ./collect_assets.sh
+RUN ./collect_assets
 
 
 # This becomes the uwsgi image
@@ -21,7 +21,7 @@ ENV \
 
 # Install debian packages and build uWSGI first to cache them in docker layer
 WORKDIR /tmp
-COPY scripts/build_uwsgi.sh ./
+COPY scripts/build_uwsgi ./
 RUN \
     apt update && \
     apt install --no-install-recommends -y \
@@ -35,7 +35,7 @@ RUN \
         gcc libc-dev libpcre3-dev make python3-dev && \
     # Poetry needs to be installed that way
     curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 && \
-    ./build_uwsgi.sh && \
+    ./build_uwsgi && \
     mv uwsgi /opt && \
     apt purge -y libc-dev libpcre3-dev make && \
     apt autoremove --purge -y && \
@@ -52,8 +52,8 @@ RUN \
     rm -rf ~/.cache/* /tmp/*
 
 # Copy config files and scripts
-COPY manage.py ./
-COPY scripts/initialize_matshare.py scripts/run_uwsgi.sh ./
+COPY data.defaults data.defaults
+COPY scripts scripts
 COPY uwsgi_configs uwsgi_configs
 
 # Finally install MatShare itself, we only need to rebuild from here when code changes
@@ -65,11 +65,10 @@ RUN \
 
 # Collect static files using django and mix with those fetched via yarn
 RUN \
-    export MS_DEBUG=1 && \
-    poetry run ./manage.py collectstatic && \
+    poetry run ./scripts/manage.py collectstatic && \
     # Compile gettext translation catalogs
     mkdir -p matshare/locale && \
-    poetry run ./manage.py compilemessages --ignore .venv
+    poetry run ./scripts/manage.py compilemessages --ignore .venv
 COPY --from=yarn_static /tmp/static static
 
-CMD ["poetry", "run", "./run_uwsgi.sh"]
+CMD ["poetry", "run", "./scripts/docker_run"]

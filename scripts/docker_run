@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/usr/bin/env -S ./scripts/config /bin/bash -e
 # The docker main command.
 
 echo '
@@ -15,12 +15,8 @@ fi
 
 export DJANGO_SETTINGS_MODULE=matshare.settings
 
-./manage.py migrate
+./scripts/init_or_upgrade
 echo
 
-./initialize_matshare.py
-echo
-
-# Make sure uWSGI's spooler directory exists and run the server
-mkdir -p spooler
+# Run the server
 exec /opt/uwsgi/uwsgi --plugin-dir=/opt/uwsgi --emperor=uwsgi_configs --vassal-set=plugin-dir=/opt/uwsgi --vassal-set=chdir=..

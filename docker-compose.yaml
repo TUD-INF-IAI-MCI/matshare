@@ -5,100 +5,11 @@ services:
     build: .
     depends_on:
     - db
-    # Set environment variables for configuring MatShare.
-    # If a setting is commented out, its value is the default.
-    # It's recommended to create a custom docker-compose.override.yaml with just
-    # the settings you need to change and leave this file as is to simplify future
-    # updates.
     environment:
-      # Run in production mode
-      #MS_DEBUG: 0
-      # Set a random string; something like 'pwgen -1sy 100' should suffice.
-      # Required in production mode.
-      #MS_SECRET_KEY: ""
-      # When running for the first time, create a superuser with these properties
-      #MS_ADMIN_USER: admin
-      #MS_ADMIN_PASSWORD: admin
-      #MS_ADMIN_EMAIL: my-admin@email.address
-      # When an error occurs ing production use, these comma-separated addresses
-      # will be notified with information about the error. The report may include
-      # sensitive data.
-      #MS_ERROR_EMAILS: ""
-      # Dates will be displayed in this time zone by default; select one from:
-      # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-      #MS_TIME_ZONE: America/Chicago
-      # URL under which MatShare is accessible to the public. This will, for instance,
-      # be used in emails.
-      #MS_URL: "http://localhost:8000"
-      # Static files are hosted efficiently at <MS_URL>/static. If,
-      # however, you want to host them elsewhere, specify the URL here
-      #MS_STATIC_URL: "<MS_URL>/static"
-      # Settings regarding e-mail sending
-      #MS_DEFAULT_FROM_EMAIL: "MatShare <my-email@my-domain>"
-      # Set in Reply-To header of sent emails
-      #MS_CONTACT_EMAIL: "MatShare <my-email@my-domain>"
-      #MS_EMAIL_HOST: localhost
-      #MS_EMAIL_PORT: 25
-      # Optionally, set credentialsfor SMTP authentication
-      #MS_EMAIL_HOST_USER: username
-      #MS_EMAIL_HOST_PASSWORD: password
-      # TLS means using STARTTLS, SSL means plain SSL below SMTP. These are mutually
-      # exclusive.
-      #MS_EMAIL_USE_SSL: 0
-      #MS_EMAIL_USE_TLS: 0
-      # Default values for newly created courses
-      #MS_COURSE_CONTRIBUTOR: ""
-      #MS_COURSE_PUBLISHER: ""
-      # Will be used for signatures of administrative commits
-      #MS_GIT_ADMIN_EMAIL: my-email@my-domain
-      # Number of worker processes to run in parallel
-      #MS_NUM_PROCESSES: 1
-      # You may want to set a number of OS threads to spawn per worker process to
-      # process requests, experiment with the numbers yourself, but higher doesn't
-      # automatically mean more performance, it doesn't scale linearly.
-      #MS_NUM_THREADS: 1
-      # Number of processes to perform spooled tasks (such as material building)
-      #MS_NUM_SPOOLER_PROCESSES: 1
-      # Process up to this number of requests to git via HTTP concurrently
-      #MS_GIT_ASYNC: 1
-      # Your postgresql database connection
-      MS_DATABASE_HOST: "db"
-      # Yes, we need to specify the port even though it's postgres's default
-      MS_DATABASE_PORT: 5432
-      MS_DATABASE_NAME: "postgres"
-      MS_DATABASE_USER: "postgres"
-      MS_DATABASE_PASSWORD: "postgres"
-      # If users should be able to authenticate against an external LDAP database,
-      # set this to 1.
-      #MS_AUTH_LDAP: 0
-      # This must point to your LDAP server; multiple space-separated URIs are
-      # supported. Required.
-      #MS_AUTH_LDAP_SERVER_URI: "ldap://ldap.example.com"
-      # Only direct binding is supported, search & bind is not possible for now.
-      # Template to construct a user's DN out of his username. Required.
-      #MS_AUTH_LDAP_USER_DN_TEMPLATE: "uid=%(user)s,ou=people,dc=example,dc=com"
-      # If you set this to the DN of a group, only members of that group can log in.
-      # You may also use a syntax similar to that of search filters in OpenLDAP
-      # (sample DNs shortened for better readability):
-      # |(cn=admins,ou=...)(&(cn=students,ou=...)(~(cn=first_term,ou=...)))
-      # This would permit login for:
-      # * users in the admins group OR
-      # * users in the students AND NOT in the first_term group
-      #MS_AUTH_LDAP_REQUIRE_GROUP: ""
-      # LDAP user attributes to populate the MatShare user account from.
-      # All are required.
-      #MS_AUTH_LDAP_USER_ATTR_EMAIL: "mail"
-      #MS_AUTH_LDAP_USER_ATTR_FIRST_NAME: "givenName"
-      #MS_AUTH_LDAP_USER_ATTR_LAST_NAME: "sn"
-      # Whether staff members can create new local users in MatShare.
-      #MS_STAFF_CAN_CREATE_USERS: "1"
-      # Whether the password reset functionality for native users should be enabled.
-      # You'll probably want to disable it when using external authentication.
-      #MS_PASSWORD_RESET: 1
-      # How long password reset links should be valid
-      #MS_PASSWORD_RESET_EXPIRATION_HOURS: 2
-      # How long to wait before logging out an inactive user
-      #MS_SESSION_EXPIRATION_SECS: 3600
+      MS_DB_HOST: db
+      MS_DB_NAME: postgres
+      MS_DB_USER: postgres
+      MS_DB_PASSWORD: postgres
     hostname: uwsgi
     image: matshare_uwsgi:latest
     restart: always

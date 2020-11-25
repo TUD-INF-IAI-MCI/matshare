@@ -42,12 +42,12 @@ sample for development purposes can be found in ``docker-compose.override-dev.ya
 
 Before starting MatShare for the first time, you need to provide a data directory
 for storing runtime data such as git repositories and uploaded files. The directory
-``data.sample`` contains the basic files to start with. Copy it over to ``data``,
+``data.defaults`` contains the basic files to start with. Copy it over to ``data``,
 which will be ignored by git. The ``data`` directory will then be mounted into the
 Docker container running MatShare.
 
 Another point for you to customize is corporate identity in the HTML templates. In
-the directory ``data.sample/custom_templates/matshare_ci``, you find a README file
+the directory ``data.defaults/custom_templates/matshare_ci``, you find a README file
 explaining how to do it.
 
 When you're all set, bring the whole stack up by running::
@@ -76,9 +76,9 @@ The general upgrade path is then:
 2. Update the code base and check ``CHANGELOG.md`` for eventual additional steps
    to take.
 
-3. Copy the contents of ``data.sample`` to your existing data directory in case git
-   hooks or similar have changed. If you modified files in ``git_initial``, make
-   sure to not overwrite your own changes.
+3. Copy the contents of ``data.defaults`` over those of your existing data
+   directory. This will *not* overwrite files explicitly documented as user-changeable,
+   such as your local config or initial git content.
 
 4. Rebuild images and recreate the containers::
 
@@ -112,7 +112,7 @@ ran from the repository's root.
 
 1. Generate proper database migrations::
 
-       poetry run ./manage.py makemigrations
+       poetry run ./scripts/manage.py makemigrations
 
 2. The code base is formatted using black, so make sure to run it::
 
@@ -120,4 +120,4 @@ ran from the repository's root.
 
 3. The translation files need to be updated after making code changes::
 
-       poetry run ./scripts/update_translations.sh
+       poetry run ./scripts/update_translations

@@ -5,8 +5,7 @@
 /docs
 
 # Default docker-compose mountpoints
-/git_repos
-/media
+/data
 /pgdata
 
 # Python bytecode

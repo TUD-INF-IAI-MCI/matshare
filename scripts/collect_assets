@@ -1,10 +1,8 @@
-#!/bin/sh
+#!/bin/sh -e
 # Collect static assets from ./node_modules and put them into ./static.
 
-set -e
-
 # Collect own assets
-yarn run sass
+yarnpkg run sass
 mkdir -p static/matshare
 mv css static/matshare
 

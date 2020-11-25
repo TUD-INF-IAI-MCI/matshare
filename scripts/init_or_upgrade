@@ -1,0 +1,7 @@
+#!/bin/bash -e
+# Apply pending database migrations and initialize a new installation, if required.
+
+./scripts/manage.py migrate
+echo
+
+./scripts/create_admin_user
