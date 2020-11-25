@@ -9,6 +9,7 @@
 
 ### Added
 * Added the `MS_DATA_DIR` setting (see below).
+* The interface now better utilizes screen widths >= 1400px.
 
 ### Changed
 * The various path settings are now all consolidated into one setting, `MS_DATA_DIR`.
